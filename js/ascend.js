@@ -1,13 +1,28 @@
 var game = new Phaser.Game(800, 600, Phaser.AUTO, '', {preload: preload, create: create, update: update});
 
 var cursors,
+    scoreText,
     starfield,
     ship;
+
+WebFontConfig = {
+
+    active: function() {
+        game.time.events.add(Phaser.Timer.SECOND, createText, this);
+    },
+
+    google: {
+        families: ['Audiowide']
+    }
+
+};
 
 function preload() {
 
     game.load.image('starfield', 'assets/starfield.png');
     game.load.spritesheet('ship', 'assets/ship_sprites.png', 45, 52);
+
+    game.load.script('webfont', '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');
 
 }
 
@@ -24,7 +39,6 @@ function create() {
     ship.animations.add('right', [0, 1, 2, 3], 8, true);
 
     cursors = game.input.keyboard.createCursorKeys();
-
 }
 
 function update() {
@@ -43,5 +57,11 @@ function update() {
         ship.animations.stop();
         ship.frame = 2;
     }
+
+}
+
+function createText() {
+
+    scoreText = game.add.text(16, 16, "SCORE: 0", {font: '400 24px Audiowide', fill: '#9F9'});
 
 }
