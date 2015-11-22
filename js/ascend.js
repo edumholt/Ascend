@@ -1,6 +1,8 @@
 var game = new Phaser.Game(800, 600, Phaser.AUTO, '', {preload: preload, create: create, update: update});
 
-var cursors,
+var bgSound,
+    cursors,
+    explode,
     scoreText,
     warningText,
     shipStats,
@@ -17,13 +19,14 @@ WebFontConfig = {
     google: {
         families: ['Audiowide']
     }
-
 };
 
 function preload() {
 
     game.load.image('starfield', 'assets/starfield.png');
     game.load.spritesheet('ship', 'assets/ship_sprites.png', 45, 52);
+    game.load.spritesheet('explosion', 'assets/explosion.png', 100, 100);
+    game.load.audio('bg', 'assets/bg.mp3');
 
     // Load Google web font 'Audiowide'
     game.load.script('webfont', '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');
@@ -31,6 +34,8 @@ function preload() {
 }
 
 function create() {
+
+    game.physics.startSystem(Phaser.Physics.ARCADE);
 
     starfield = game.add.tileSprite(0, 0, 800, 600, 'starfield');
 
@@ -40,50 +45,65 @@ function create() {
     ship.body.collideWorldBounds = true;
     ship.anchor.x = ship.anchor.y = 0.5;
 
-    ship.animations.add('left', [3, 2, 1, 0], 8, true);
-    ship.animations.add('right', [0, 1, 2, 3], 8, true);
+    ship.animations.add('rotate', [], 30, true);
 
     cursors = game.input.keyboard.createCursorKeys();
 
     warningText = game.add.text(16, game.world.height - 40, '', {font: '400 18px Audiowide', fill: '#F33', align: 'center'});
+
+    bgSound = game.add.audio('bg');
+    bgSound.play('', 0, 1, true);
 }
 
 function update() {
 
     starfield.tilePosition.y += 0.4;
 
-    ship.body.velocity.x = 0;
-
-    if(cursors.left.isDown) {
-        ship.body.velocity.x = -100;
-        ship.animations.play('left');
-    } else if(cursors.right.isDown) {
-        ship.body.velocity.x = 100;
-        ship.animations.play('right');
-    } else {
+    if(!(cursors.left.isDown || cursors.right.isDown || cursors.up.isDown)) {
         ship.animations.stop();
-        ship.frame = 2;
     }
 
-    if(cursors.up.isDown) {
-        ship.body.velocity.y = -70;
-        ship.frame = 1;
+    if(ship.alive){
+        ship.body.velocity.x = 0;
+
+        if(cursors.left.isDown) {
+            ship.body.velocity.x = -100;
+            ship.animations.play('rotate');
+        } else if(cursors.right.isDown) {
+            ship.body.velocity.x = 100;
+            ship.animations.play('rotate');
+        }
+
+        if(cursors.up.isDown) {
+            ship.body.velocity.y = -70;
+            ship.animations.play('rotate');
+        }
     }
 
-    if(ship.y >= game.world.height - 80) {
+    if(ship.y >= game.world.height - 200) {
         warningText.text = "WARNING: ACCELERATE SHIP";
     } else {
         warningText.text = '';
     }
 
-
-    if(ship.y >= game.world.height - 30 ) {
-        ship.destroy();
+    if(ship.y >= game.world.height - 50 ) {
+        gameOver();
     }
 
+    if(!ship.alive) {
+        explode.animations.play('anim');
+    }
 }
 
 function createText() {
     scoreText = game.add.text(16, 16, "SCORE: 0", {font: '400 24px Audiowide', fill: '#9F9'});
 }
 
+function gameOver() {
+
+    ship.alive = false;
+    ship.destroy();
+    explode = game.add.sprite(ship.x, ship.y, 'explosion');
+    explode.anchor.x = explode.anchor.y = 0.5;
+    explode.animations.add('anim', [], 30, false);
+}
