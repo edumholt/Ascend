@@ -2,6 +2,7 @@ var game = new Phaser.Game(800, 600, Phaser.AUTO, '', {preload: preload, create:
 
 var bgSound,
     cursors,
+    dangerZone,
     explode,
     scoreText,
     warningText,
@@ -24,6 +25,7 @@ WebFontConfig = {
 function preload() {
 
     game.load.image('starfield', 'assets/starfield.png');
+    game.load.image('dangerZone', 'assets/DoNotEnter.png');
     game.load.spritesheet('ship', 'assets/ship_sprites.png', 45, 52);
     game.load.spritesheet('explosion', 'assets/explosion.png', 100, 100);
     game.load.audio('bg', 'assets/bg.mp3');
@@ -47,9 +49,11 @@ function create() {
 
     ship.animations.add('rotate', [], 30, true);
 
+    dangerZone = game.add.sprite(0, game.height - 50, 'dangerZone');
+
     cursors = game.input.keyboard.createCursorKeys();
 
-    warningText = game.add.text(16, game.world.height - 40, '', {font: '400 18px Audiowide', fill: '#F33', align: 'center'});
+    warningText = game.add.text(16, 40, '', {font: '400 20px Audiowide', fill: '#F33', align: 'center'});
 
     bgSound = game.add.audio('bg');
     bgSound.play('', 0, 1, true);
@@ -80,7 +84,7 @@ function update() {
         }
     }
 
-    if(ship.y >= game.world.height - 200) {
+    if(ship.y >= game.world.height - 160) {
         warningText.text = "WARNING: ACCELERATE SHIP";
     } else {
         warningText.text = '';
