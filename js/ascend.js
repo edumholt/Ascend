@@ -1,9 +1,10 @@
 var game = new Phaser.Game(800, 600, Phaser.AUTO, '', {preload: preload, create: create, update: update});
 
-var bgSound,
+var asteroids,
+    bgSound,
     cursors,
     dangerZone,
-    explode,
+    explodeShip,
     scoreText,
     warningText,
     shipStats,
@@ -26,8 +27,9 @@ function preload() {
 
     game.load.image('starfield', 'assets/starfield.png');
     game.load.image('dangerZone', 'assets/DoNotEnter.png');
+    game.load.spritesheet('asteroid', 'assets/asteroid.png', 36, 36);
     game.load.spritesheet('ship', 'assets/ship_sprites.png', 45, 52);
-    game.load.spritesheet('explosion', 'assets/explosion.png', 100, 100);
+    game.load.spritesheet('shipExplosion', 'assets/explosion.png', 100, 100);
     game.load.audio('bg', 'assets/bg.mp3');
 
     // Load Google web font 'Audiowide'
@@ -45,9 +47,19 @@ function create() {
     game.physics.arcade.enable(ship);
     ship.body.gravity.y = 140;
     ship.body.collideWorldBounds = true;
-    ship.anchor.x = ship.anchor.y = 0.5;
+    ship.anchor.setTo(0.5, 0.5);
 
-    ship.animations.add('rotate', [], 30, true);
+    ship.animations.add('rotateTurrets', [], 30, true);
+
+    // Create asteroids group
+    asteroids = game.add.group();
+    asteroids.enableBody = true;
+    asteroids.physicsBodyType = Phaser.Physics.ARCADE;
+
+    asteroids.setAll('anchor.x', 0.5);
+    asteroids.setAll('anchor.y', 0.5);
+    asteroids.setAll('outOfBoundsKill', true);
+    asteroids.setAll('checkWorldBounds', true);
 
     dangerZone = game.add.sprite(0, game.height - 50, 'dangerZone');
 
@@ -63,6 +75,8 @@ function update() {
 
     starfield.tilePosition.y += 0.4;
 
+    createRandomAsteroid();
+
     if(!(cursors.left.isDown || cursors.right.isDown || cursors.up.isDown)) {
         ship.animations.stop();
     }
@@ -72,15 +86,15 @@ function update() {
 
         if(cursors.left.isDown) {
             ship.body.velocity.x = -100;
-            ship.animations.play('rotate');
+            ship.animations.play('rotateTurrets');
         } else if(cursors.right.isDown) {
             ship.body.velocity.x = 100;
-            ship.animations.play('rotate');
+            ship.animations.play('rotateTurrets');
         }
 
         if(cursors.up.isDown) {
             ship.body.velocity.y = -70;
-            ship.animations.play('rotate');
+            ship.animations.play('rotateTurrets');
         }
     }
 
@@ -94,20 +108,28 @@ function update() {
         gameOver();
     }
 
-    if(!ship.alive) {
-        explode.animations.play('anim');
-    }
 }
 
 function createText() {
     scoreText = game.add.text(16, 16, "SCORE: 0", {font: '400 24px Audiowide', fill: '#9F9'});
 }
 
-function gameOver() {
+function createRandomAsteroid() {
 
+    if(Math.random() < .001) {
+        var asteroid = asteroids.create(Math.random() * 600 + 100, 0, 'asteroid', 1);
+        asteroid.body.velocity.setTo(Math.random() * 60 - 30, Math.random() * 30 + 20);
+        asteroid.animations.add('spin', [], 10, true);
+        asteroid.play('spin');
+    }
+
+}
+
+function gameOver() {
     ship.alive = false;
     ship.destroy();
-    explode = game.add.sprite(ship.x, ship.y, 'explosion');
-    explode.anchor.x = explode.anchor.y = 0.5;
-    explode.animations.add('anim', [], 30, false);
+    explodeShip = game.add.sprite(ship.x, ship.y, 'shipExplosion');
+    explodeShip.anchor.setTo(0.5, 0.5);
+    explodeShip.animations.add('anim', [], 30);
+    explodeShip.animations.play('anim');
 }
