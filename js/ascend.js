@@ -36,7 +36,6 @@ function preload() {
     game.load.image('bullet', 'assets/bullet.png');
     game.load.image('platform', 'assets/platformOne.png');
     game.load.image('baddie1', 'assets/andriodShip.png');
-    game.load.image('baddie2', 'assets/spaceShip.png');
     game.load.spritesheet('baddie3', 'pinkEnemy.png', 51, 51); 
     game.load.spritesheet('asteroid', 'assets/asteroid.png', 36, 36);
     game.load.spritesheet('ship', 'assets/ship_sprites.png', 45, 52);
