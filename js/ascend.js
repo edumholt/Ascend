@@ -1,6 +1,7 @@
 var game = new Phaser.Game(800, 600, Phaser.AUTO, '', {preload: preload, create: create, update: update});
 
 var asteroids,
+    bad1,
     bgSound,
     bulletSound,
     bullets,
@@ -9,6 +10,7 @@ var asteroids,
     dangerZone,
     explodeShip,
     fireButton,
+    platforms,
     scoreText,
     warningText,
     shipStats,
@@ -32,6 +34,10 @@ function preload() {
     game.load.image('starfield', 'assets/starfield.png');
     game.load.image('dangerZone', 'assets/DoNotEnter.png');
     game.load.image('bullet', 'assets/bullet.png');
+    game.load.image('platform', 'assets/platformOne.png');
+    game.load.image('baddie1', 'assets/andriodShip.png');
+    game.load.image('baddie2', 'assets/spaceShip.png');
+    game.load.spritesheet('baddie3', 'pinkEnemy.png', 51, 51); 
     game.load.spritesheet('asteroid', 'assets/asteroid.png', 36, 36);
     game.load.spritesheet('ship', 'assets/ship_sprites.png', 45, 52);
     game.load.spritesheet('shipExplosion', 'assets/explosion.png', 100, 100);
@@ -76,7 +82,40 @@ function create() {
     asteroids.setAll('anchor.y', 0.5);
     asteroids.setAll('outOfBoundsKill', true);
     asteroids.setAll('checkWorldBounds', true);
+    
+    platforms = game.add.group();
+    platforms.enableBody = true;
+    platforms.physicsBodyType = Phaser.Physics.ARCADE;
+    platforms.collideWorldBounds =true;
+    
+    platforms.setAll('anchor.x', 0.5);
+    platforms.setAll('anchor.y', 0.5);
+    platforms.setAll('outOfBoundsKill', true);
+    platforms.setAll('checkWorldBounds', true);  
 
+    pOne = platforms.create(200, 200, 'platform');
+    pOne.body.immovable = true;
+    pOne.body.collideWorldBounds = true;
+    //pOne.body.gravity.y = 10;
+    
+    badies = game.add.group();
+    badies.enableBody = true;
+    badies.physicsBodyType = Phaser.Physics.ARCADE;
+    
+    badies.setAll('anchor.x', 0.5);
+    badies.setAll('anchor.y', 0.5);
+    badies.setAll('outOfBoundsKill', true);
+    badies.setAll('checkWorldBounds', true);
+    
+    bad1 = badies.create(pOne.x, pOne.y - 45, 'baddie1');
+    
+    
+    pOne.body.bounce.set(1);
+    
+    ship.body.bounce.set(1);
+    
+    
+    
     dangerZone = game.add.sprite(0, game.height - 50, 'dangerZone');
 
     // Game controls
@@ -91,10 +130,15 @@ function create() {
 }
 
 function update() {
+    
+    game.physics.arcade.collide(ship, platforms, baddieRelease, null, this);
+
 
     starfield.tilePosition.y += 0.4;
 
     createRandomAsteroid();
+    
+    //creatRandomPlatform();
 
     if(!(cursors.left.isDown || cursors.right.isDown || cursors.up.isDown)) {
         ship.animations.stop();
@@ -149,6 +193,18 @@ function createRandomAsteroid() {
 
 }
 
+function creatRandomPlatform() {
+
+    if(Math.random() < .001) {
+        var platform = platforms.create(Math.random() * 600 + 100, 0, 'platform', 1);
+        platform.body.velocity.setTo(0, Math.random() * 30 + 20);
+        platform.body.immovable = true;
+        platform.body.bounce.y = 0.7;
+    }
+
+    
+}
+
 function fireBullet() {
     // To prevent bullets from being fired too fast, we set a time limit
     if(game.time.now > bulletTime) {
@@ -163,6 +219,14 @@ function fireBullet() {
         }
     }
 
+}
+
+
+
+function baddieRelease() {
+    
+        var tween = game.add.tween(bad1).to({x: bad1.x - 150}, 2000, Phaser.Easing.Linear.None, true, 0, 500, true);
+    
 }
 
 function gameOver() {
