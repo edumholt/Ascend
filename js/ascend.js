@@ -1,6 +1,7 @@
 var game = new Phaser.Game(800, 600, Phaser.AUTO, '', {preload: preload, create: create, update: update});
 
 var asteroids,
+    bad1,
     bgSound,
     bulletSound,
     bullets,
@@ -9,6 +10,7 @@ var asteroids,
     dangerZone,
     explodeShip,
     fireButton,
+    platforms,
     scoreText,
     warningText,
     shipStats,
@@ -32,6 +34,9 @@ function preload() {
     game.load.image('starfield', 'assets/starfield.png');
     game.load.image('dangerZone', 'assets/DoNotEnter.png');
     game.load.image('bullet', 'assets/bullet.png');
+    game.load.image('platform', 'assets/platformOne.png');
+    game.load.image('baddie1', 'assets/andriodShip.png');
+    game.load.image('baddie2', 'assets/spaceShip.png'); 
     game.load.spritesheet('asteroid', 'assets/asteroid.png', 36, 36);
     game.load.spritesheet('ship', 'assets/ship_sprites.png', 45, 52);
     game.load.spritesheet('shipExplosion', 'assets/explosion.png', 100, 100);
@@ -76,6 +81,40 @@ function create() {
     asteroids.setAll('anchor.y', 0.5);
     asteroids.setAll('outOfBoundsKill', true);
     asteroids.setAll('checkWorldBounds', true);
+    
+    platforms = game.add.group();
+    platforms.enableBody = true;
+    platforms.physicsBodyType = Phaser.Physics.ARCADE;
+    platforms.collideWorldBounds =true;
+    
+    platforms.setAll('anchor.x', 0.5);
+    platforms.setAll('anchor.y', 0.5);
+    platforms.setAll('checkWorldBounds', true);
+    platforms.setAll('outOfBoundsKill', true);
+    
+    pOne = platforms.create(50, 1, 'platform');
+    pOne.body.immovable = true;
+    pOne.body.gravity.y = 5;
+    
+    pTwo = platforms.create(500, -50, 'platform');
+    pTwo.body.immovable = true;
+    pTwo.body.gravity.y = 5;
+    
+    badies = game.add.group();
+    badies.enableBody = true;
+    badies.physicsBodyType = Phaser.Physics.ARCADE;
+    
+    badies.setAll('anchor.x', 0.5);
+    badies.setAll('anchor.y', 0.5);
+    badies.setAll('checkWorldBounds', true);
+    badies.setAll('outOfBoundsKill', true);
+    
+    
+    bad1 = badies.create(pOne.x, pOne.y - 45, 'baddie1');
+    bad1.body.gravity.y = 5;
+    
+    bad2 = badies.create(pTwo.x, pTwo.y - 45, 'baddie2');
+    bad2.body.gravity.y = 5;
 
     dangerZone = game.add.sprite(0, game.height - 50, 'dangerZone');
 
@@ -91,6 +130,18 @@ function create() {
 }
 
 function update() {
+    
+    game.physics.arcade.collide(ship, pOne, baddieRelease, null, this);
+    
+    game.physics.arcade.collide(ship, pTwo, baddieRelease2, null, this);    
+   
+    game.physics.arcade.collide(badies, platforms);
+    
+    game.physics.arcade.collide(bullets, platforms);
+    
+    game.physics.arcade.collide(bullets, bad1, baddieOneKill, null, this);    
+    
+    game.physics.arcade.collide(bullets, bad2, baddieTwoKill, null, this);    
 
     starfield.tilePosition.y += 0.4;
 
@@ -131,6 +182,44 @@ function update() {
     if(ship.y >= game.world.height - 50 ) {
         gameOver();
     }
+    
+    if(!platforms.countLiving() && !badies.countLiving()) {
+        
+        game.tweens.removeAll();
+        
+        pOne = platforms.create(50, 1, 'platform');
+        pOne.body.gravity.y = 5;
+        pOne.body.immovable = true;
+        
+        bad1 = badies.create(pOne.x, pOne.y - 45, 'baddie1');
+        bad1.body.gravity.y = 5;
+        
+        pTwo = platforms.create(500, -50, 'platform');
+        pTwo.body.immovable = true;
+        pTwo.body.gravity.y = 5;
+        
+        bad2 = badies.create(pTwo.x, pTwo.y - 45, 'baddie2');
+        bad2.body.gravity.y = 5;
+        
+    }
+    
+    if(pOne.y >= game.world.height - 75 ) {
+        pOne.kill();
+   }
+    
+    if(pTwo.y >= game.world.height - 75 ) {
+        pTwo.kill();
+    }
+    
+    if(bad1.y >= game.world.height - 75 ) {
+        bad1.kill();
+   }
+    
+    if(bad2.y >= game.world.height - 75 ) {
+        bad2.kill();
+    }
+    
+    
 
 }
 
@@ -164,6 +253,34 @@ function fireBullet() {
     }
 
 }
+
+function baddieRelease() {
+    bad1.body.velocity.y = 0;
+    bad1.body.gravity.y = 0;
+    tween1 = game.add.tween(bad1).to({x: 400}, 2000, Phaser.Easing.Linear.None, true, 0, 500, true);
+    tween1.onLoop.add(descend, this);
+    
+}
+
+function baddieRelease2() {
+    bad2.body.velocity.y = 0;
+    bad2.body.gravity.y = 0;
+    tween2 = game.add.tween(bad2).to({x: 200}, 2000, Phaser.Easing.Linear.None, true, 0, 500, true);
+    tween2.onLoop.add(descend, this);
+    
+}
+
+function baddieOneKill() {
+    bad1.kill();
+}
+function baddieTwoKill() {
+    bad2.kill();
+}
+
+function descend() {
+    bad1.y += 1;
+}
+
 
 function gameOver() {
     ship.alive = false;
