@@ -100,11 +100,11 @@ function create() {
     
     pOne = platforms.create(50, 1, 'platform');
     pOne.body.immovable = true;
-    pOne.body.velocity.y = 15;
+    pOne.body.velocity.y = 30;
     
     pTwo = platforms.create(500, -45, 'platform');
     pTwo.body.immovable = true;
-    pTwo.body.velocity.y = 15;
+    pTwo.body.velocity.y = 30;
     
     badies = game.add.group();
     badies.enableBody = true;
@@ -116,16 +116,16 @@ function create() {
     badies.setAll('outOfBoundsKill', true);
     
     bad1 = badies.create(pOne.x, pOne.y - 45, 'baddie1');
-    bad1.body.velocity.y = 15;
+    bad1.body.velocity.y = 30;
     
     bad2 = badies.create(pOne.x + 200, pTwo.y - 25, 'baddie2');
-    bad2.body.velocity.y = 15;
+    bad2.body.velocity.y = 30;
     
     bad3 = badies.create(pTwo.x + +25, pTwo.y - 45, 'baddie3');
-    bad3.body.velocity.y = 15;
+    bad3.body.velocity.y = 30;
     
     bad4 = badies.create(pTwo.x + 175, pTwo.y - 40, 'baddie4');
-    bad4.body.velocity.y = 15;
+    bad4.body.velocity.y = 30;
 
     dangerZone = game.add.sprite(0, game.height - 50, 'dangerZone');
 
@@ -207,35 +207,49 @@ function update() {
         game.tweens.removeAll();
         
         pOne = platforms.create(50, 1, 'platform');
-        pOne.body.velocity.y = 15;
+        pOne.body.velocity.y = 30;
         pOne.body.immovable = true;
         
         bad1 = badies.create(pOne.x, pOne.y - 45, 'baddie1');
-        bad1.body.velocity.y = 15;
+        bad1.body.velocity.y = 30;
+    
+        bad2 = badies.create(pOne.x + 200, pOne.y - 65, 'baddie2');
+        bad2.body.velocity.y = 30;
         
         pTwo = platforms.create(500, -50, 'platform');
         pTwo.body.immovable = true;
-        pTwo.body.velocity.y = 15;
+        pTwo.body.velocity.y = 30;
         
-        bad2 = badies.create(pTwo.x + 200, pTwo.y - 45, 'baddie2');
-        bad2.body.velocity.y = 15;
+        bad3 = badies.create(pTwo.x + +25, pTwo.y - 45, 'baddie3');
+        bad3.body.velocity.y = 30;
+    
+        bad4 = badies.create(pTwo.x + 175, pTwo.y - 40, 'baddie4');
+        bad4.body.velocity.y = 30;
         
     }
     
     if(pOne.y >= game.world.height - 75 ) {
-        pOne.kill();
+        pOne.destroy();
    }
     
     if(pTwo.y >= game.world.height - 75 ) {
-        pTwo.kill();
+        pTwo.destroy();
     }
     
     if(bad1.y >= game.world.height - 75 ) {
-        bad1.kill();
+        bad1.destroy();
    }
     
     if(bad2.y >= game.world.height - 75 ) {
-        bad2.kill();
+        bad2.destroy();
+    }
+    
+    if(bad3.y >= game.world.height - 75 ) {
+        bad3.destroy();
+    }
+    
+    if(bad4.y >= game.world.height - 75 ) {
+        bad4.destroy();
     }
     
     
