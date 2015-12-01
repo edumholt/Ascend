@@ -36,12 +36,18 @@ function preload() {
     game.load.image('bullet', 'assets/bullet.png');
     game.load.image('platform', 'assets/platformOne.png');
     game.load.image('baddie1', 'assets/andriodShip.png');
-    game.load.image('baddie2', 'assets/spaceShip.png'); 
+    game.load.image('baddie2', 'assets/alien3.png'); 
+    game.load.image('baddie3', 'assets/spaceShip.png'); 
+    game.load.image('baddie4', 'assets/gunship.png'); 
     game.load.spritesheet('asteroid', 'assets/asteroid.png', 36, 36);
     game.load.spritesheet('ship', 'assets/ship_sprites.png', 45, 52);
     game.load.spritesheet('shipExplosion', 'assets/explosion.png', 100, 100);
     game.load.audio('bg', 'assets/bg.mp3');
     game.load.audio('bulletSound', 'assets/bulletSound.mp3');
+    game.load.audio('platformHit', 'assets/platformHit.mp3');
+    game.load.audio('platformShot', 'assets/platformShot.mp3');
+    game.load.audio('expl', 'assets/expl.mp3');
+    
 
     // Load Google web font 'Audiowide'
     game.load.script('webfont', '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');
@@ -94,11 +100,11 @@ function create() {
     
     pOne = platforms.create(50, 1, 'platform');
     pOne.body.immovable = true;
-    pOne.body.gravity.y = 5;
+    pOne.body.velocity.y = 15;
     
-    pTwo = platforms.create(500, -50, 'platform');
+    pTwo = platforms.create(500, -45, 'platform');
     pTwo.body.immovable = true;
-    pTwo.body.gravity.y = 5;
+    pTwo.body.velocity.y = 15;
     
     badies = game.add.group();
     badies.enableBody = true;
@@ -109,12 +115,17 @@ function create() {
     badies.setAll('checkWorldBounds', true);
     badies.setAll('outOfBoundsKill', true);
     
-    
     bad1 = badies.create(pOne.x, pOne.y - 45, 'baddie1');
-    bad1.body.gravity.y = 5;
+    bad1.body.velocity.y = 15;
     
-    bad2 = badies.create(pTwo.x, pTwo.y - 45, 'baddie2');
-    bad2.body.gravity.y = 5;
+    bad2 = badies.create(pOne.x + 200, pTwo.y - 25, 'baddie2');
+    bad2.body.velocity.y = 15;
+    
+    bad3 = badies.create(pTwo.x + +25, pTwo.y - 45, 'baddie3');
+    bad3.body.velocity.y = 15;
+    
+    bad4 = badies.create(pTwo.x + 175, pTwo.y - 40, 'baddie4');
+    bad4.body.velocity.y = 15;
 
     dangerZone = game.add.sprite(0, game.height - 50, 'dangerZone');
 
@@ -127,6 +138,10 @@ function create() {
     bulletSound = game.add.audio('bulletSound');
     bgSound = game.add.audio('bg');
     bgSound.play('', 0, 1, true);
+    
+    pHitSound = game.add.audio('platformHit');
+    pShotSound = game.add.audio('platformShot');
+    eBoom = game.add.audio('expl');
 }
 
 function update() {
@@ -137,11 +152,15 @@ function update() {
    
     game.physics.arcade.collide(badies, platforms);
     
-    game.physics.arcade.collide(bullets, platforms);
+    game.physics.arcade.collide(bullets, platforms, hit, null, this);
     
     game.physics.arcade.collide(bullets, bad1, baddieOneKill, null, this);    
     
     game.physics.arcade.collide(bullets, bad2, baddieTwoKill, null, this);    
+    
+    game.physics.arcade.collide(bullets, bad3, baddieThreeKill, null, this);    
+    
+    game.physics.arcade.collide(bullets, bad4, baddieFourKill, null, this);    
 
     starfield.tilePosition.y += 0.4;
 
@@ -188,18 +207,18 @@ function update() {
         game.tweens.removeAll();
         
         pOne = platforms.create(50, 1, 'platform');
-        pOne.body.gravity.y = 5;
+        pOne.body.velocity.y = 15;
         pOne.body.immovable = true;
         
         bad1 = badies.create(pOne.x, pOne.y - 45, 'baddie1');
-        bad1.body.gravity.y = 5;
+        bad1.body.velocity.y = 15;
         
         pTwo = platforms.create(500, -50, 'platform');
         pTwo.body.immovable = true;
-        pTwo.body.gravity.y = 5;
+        pTwo.body.velocity.y = 15;
         
-        bad2 = badies.create(pTwo.x, pTwo.y - 45, 'baddie2');
-        bad2.body.gravity.y = 5;
+        bad2 = badies.create(pTwo.x + 200, pTwo.y - 45, 'baddie2');
+        bad2.body.velocity.y = 15;
         
     }
     
@@ -256,31 +275,87 @@ function fireBullet() {
 
 function baddieRelease() {
     bad1.body.velocity.y = 0;
-    bad1.body.gravity.y = 0;
-    tween1 = game.add.tween(bad1).to({x: 400}, 2000, Phaser.Easing.Linear.None, true, 0, 500, true);
-    tween1.onLoop.add(descend, this);
+    bad2.body.velocity.y = 0;
+    
+    tween1 = game.add.tween(bad1).to({x: 250}, 2000, Phaser.Easing.Linear.None, true, 0, 500, true);
+    tween1.onLoop.add(descend1, this);
+    
+    tween2 = game.add.tween(bad2).to({x: 390}, 2000, Phaser.Easing.Linear.None, true, 0, 500, true);
+    tween2.onLoop.add(descend2, this);
+    
+    pHitSound.play();
     
 }
 
 function baddieRelease2() {
-    bad2.body.velocity.y = 0;
-    bad2.body.gravity.y = 0;
-    tween2 = game.add.tween(bad2).to({x: 200}, 2000, Phaser.Easing.Linear.None, true, 0, 500, true);
-    tween2.onLoop.add(descend, this);
+    bad3.body.velocity.y = 0;
+    bad4.body.velocity.y = 0;
     
+    tween3 = game.add.tween(bad3).to({x: 405}, 2000, Phaser.Easing.Linear.None, true, 0, 500, true);
+    tween3.onLoop.add(descend3, this);
+    
+    tween4 = game.add.tween(bad4).to({x: 450}, 2000, Phaser.Easing.Linear.None, true, 0, 500, true);
+    tween4.onLoop.add(descend4, this);
+    
+    pHitSound.play();
+    
+}
+
+function descend1() {
+    bad1.y += 1;
+}
+
+function descend2() {
+    bad2.y += 1;
+}
+
+function descend3() {
+    bad3.y += 1;
+}
+
+function descend4() {
+    bad4.y += 1;
 }
 
 function baddieOneKill() {
     bad1.kill();
+    bullet.kill();
+    explodeBaddie = game.add.sprite(bad1.x, bad1.y, 'shipExplosion');
+    explodeBaddie.anchor.setTo(0.5, 0.5);
+    explodeBaddie.animations.add('expl', [], 30);
+    explodeBaddie.animations.play('expl');
+    eBoom.play();
 }
 function baddieTwoKill() {
     bad2.kill();
+    bullet.kill();
+    explodeBaddie = game.add.sprite(bad2.x, bad2.y, 'shipExplosion');
+    explodeBaddie.anchor.setTo(0.5, 0.5);
+    explodeBaddie.animations.add('expl', [], 30);
+    explodeBaddie.animations.play('expl');
+    eBoom.play();
+}function baddieThreeKill() {
+    bad3.kill();
+    bullet.kill();
+    explodeBaddie = game.add.sprite(bad3.x, bad3.y, 'shipExplosion');
+    explodeBaddie.anchor.setTo(0.5, 0.5);
+    explodeBaddie.animations.add('expl', [], 30);
+    explodeBaddie.animations.play('expl');
+    eBoom.play();
+}function baddieFourKill() {
+    bad4.kill();
+    bullet.kill();
+    explodeBaddie = game.add.sprite(bad4.x, bad4.y, 'shipExplosion');
+    explodeBaddie.anchor.setTo(0.5, 0.5);
+    explodeBaddie.animations.add('expl', [], 30);
+    explodeBaddie.animations.play('expl');
+    eBoom.play();
 }
 
-function descend() {
-    bad1.y += 1;
+function hit(bullet) {
+    bullet.kill();
+    pShotSound.play();
 }
-
 
 function gameOver() {
     ship.alive = false;
