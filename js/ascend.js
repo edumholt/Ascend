@@ -42,6 +42,10 @@ function preload() {
     game.load.spritesheet('shipExplosion', 'assets/explosion.png', 100, 100);
     game.load.audio('bg', 'assets/bg.mp3');
     game.load.audio('bulletSound', 'assets/bulletSound.mp3');
+    game.load.audio('platformHit', 'assets/platformHit.mp3');
+    game.load.audio('platformShot', 'assets/platformShot.mp3');
+    game.load.audio('expl', 'assets/expl.mp3');
+    
 
     // Load Google web font 'Audiowide'
     game.load.script('webfont', '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');
@@ -127,6 +131,10 @@ function create() {
     bulletSound = game.add.audio('bulletSound');
     bgSound = game.add.audio('bg');
     bgSound.play('', 0, 1, true);
+    
+    pHitSound = game.add.audio('platformHit');
+    pShotSound = game.add.audio('platformShot');
+    eBoom = game.add.audio('expl');
 }
 
 function update() {
@@ -137,7 +145,7 @@ function update() {
    
     game.physics.arcade.collide(badies, platforms);
     
-    game.physics.arcade.collide(bullets, platforms);
+    game.physics.arcade.collide(bullets, platforms, hit, null, this);
     
     game.physics.arcade.collide(bullets, bad1, baddieOneKill, null, this);    
     
@@ -259,6 +267,7 @@ function baddieRelease() {
     bad1.body.gravity.y = 0;
     tween1 = game.add.tween(bad1).to({x: 400}, 2000, Phaser.Easing.Linear.None, true, 0, 500, true);
     tween1.onLoop.add(descend, this);
+    pHitSound.play();
     
 }
 
@@ -267,20 +276,37 @@ function baddieRelease2() {
     bad2.body.gravity.y = 0;
     tween2 = game.add.tween(bad2).to({x: 200}, 2000, Phaser.Easing.Linear.None, true, 0, 500, true);
     tween2.onLoop.add(descend, this);
+    pHitSound.play();
     
 }
 
 function baddieOneKill() {
     bad1.kill();
+    bullet.kill();
+    explodeBaddie = game.add.sprite(bad1.x, bad1.y, 'shipExplosion');
+    explodeBaddie.anchor.setTo(0.5, 0.5);
+    explodeBaddie.animations.add('expl', [], 30);
+    explodeBaddie.animations.play('expl');
+    eBoom.play();
 }
 function baddieTwoKill() {
     bad2.kill();
+    bullet.kill();
+    explodeBaddie = game.add.sprite(bad2.x, bad2.y, 'shipExplosion');
+    explodeBaddie.anchor.setTo(0.5, 0.5);
+    explodeBaddie.animations.add('expl', [], 30);
+    explodeBaddie.animations.play('expl');
+    eBoom.play();
 }
 
 function descend() {
     bad1.y += 1;
 }
 
+function hit(bullet) {
+    bullet.kill();
+    pShotSound.play();
+}
 
 function gameOver() {
     ship.alive = false;
