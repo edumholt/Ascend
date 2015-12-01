@@ -12,6 +12,7 @@ var asteroids,
     explodeShip,
     fireButton,
     platforms,
+    score = 0,
     scoreText,
     warningText,
     shipStats,
@@ -90,6 +91,7 @@ function create() {
     asteroids.setAll('outOfBoundsKill', true);
     asteroids.setAll('checkWorldBounds', true);
     
+    // Create platforms group
     platforms = game.add.group();
     platforms.enableBody = true;
     platforms.physicsBodyType = Phaser.Physics.ARCADE;
@@ -108,6 +110,8 @@ function create() {
     pTwo.body.immovable = true;
     pTwo.body.velocity.y = 30;
     
+
+    // Create baddies group
     badies = game.add.group();
     badies.enableBody = true;
     badies.physicsBodyType = Phaser.Physics.ARCADE;
@@ -333,6 +337,7 @@ function baddieOneKill() {
     explodeBaddie.animations.add('expl', [], 30);
     explodeBaddie.animations.play('expl');
     eBoom.play();
+    incrementScore(30);
 }
 
 function baddieTwoKill() {
@@ -343,6 +348,7 @@ function baddieTwoKill() {
     explodeBaddie.animations.add('expl', [], 30);
     explodeBaddie.animations.play('expl');
     eBoom.play();
+    incrementScore(30);
 }
 
 function baddieThreeKill() {
@@ -353,6 +359,7 @@ function baddieThreeKill() {
     explodeBaddie.animations.add('expl', [], 30);
     explodeBaddie.animations.play('expl');
     eBoom.play();
+    incrementScore(30);
 }
 
 function baddieFourKill() {
@@ -363,6 +370,7 @@ function baddieFourKill() {
     explodeBaddie.animations.add('expl', [], 30);
     explodeBaddie.animations.play('expl');
     eBoom.play();
+    incrementScore(30);
 }
 
 function asteroidExplode(bullet, asteroid) {
@@ -372,12 +380,17 @@ function asteroidExplode(bullet, asteroid) {
     asteroidExplosion.anchor.setTo(0.5, 0.5);
     asteroidExplosion.animations.add('explode', [], 30);
     asteroidExplosion.animations.play('explode');
-
+    incrementScore(10);
 }
 
 function hit(bullet) {
     bullet.kill();
     pShotSound.play();
+}
+
+function incrementScore(incrementAmount) {
+    score += incrementAmount;
+    scoreText.text = 'SCORE: ' + score;
 }
 
 function gameOver() {
