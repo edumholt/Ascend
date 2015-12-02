@@ -50,6 +50,8 @@ function preload() {
     game.load.audio('platformHit', 'assets/platformHit.mp3');
     game.load.audio('platformShot', 'assets/platformShot.mp3');
     game.load.audio('expl', 'assets/expl.mp3');
+    game.load.audio('alert', 'assets/intruderAlert.mp3');
+    game.load.audio('asteroidExplosion', 'assets/asteroidExplosion.mp3');
     
 
     // Load Google web font 'Audiowide'
@@ -63,11 +65,12 @@ function create() {
 
     starfield = game.add.tileSprite(0, 0, 800, 600, 'starfield');
 
-    ship = game.add.sprite(400, 400, 'ship');
+    ship = game.add.sprite(400, 300, 'ship');
     game.physics.arcade.enable(ship);
     ship.body.gravity.y = 140;
     ship.body.collideWorldBounds = true;
     ship.anchor.setTo(0.5, 0.5);
+    ship.body.bounce.y = 1;
 
     ship.animations.add('rotateTurrets', [], 30, true);
 
@@ -109,7 +112,6 @@ function create() {
     pTwo = platforms.create(500, -45, 'platform');
     pTwo.body.immovable = true;
     pTwo.body.velocity.y = 30;
-    
 
     // Create baddies group
     badies = game.add.group();
@@ -141,13 +143,16 @@ function create() {
 
     warningText = game.add.text(16, 56, '', {font: '400 20px Audiowide', fill: '#F33', align: 'center'});
 
+    // Add Sounds
     bulletSound = game.add.audio('bulletSound');
     bgSound = game.add.audio('bg');
-    bgSound.play('', 0, 1, true);
-    
     pHitSound = game.add.audio('platformHit');
     pShotSound = game.add.audio('platformShot');
     eBoom = game.add.audio('expl');
+    alertSound = game.add.audio('alert');
+    asteroidSound = game.add.audio('asteroidExplosion');
+    bgSound.play('', 0, 1, true);
+
 }
 
 function update() {
@@ -260,7 +265,7 @@ function createText() {
 
 function createRandomAsteroid() {
 
-    if(Math.random() < .001) {
+    if(Math.random() < .003) {
         var asteroid = asteroids.create(Math.random() * 600 + 100, 0, 'asteroid', 1);
         asteroid.body.velocity.setTo(Math.random() * 60 - 30, Math.random() * 30 + 20);
         asteroid.animations.add('spin', [], 10, true);
@@ -380,6 +385,7 @@ function asteroidExplode(bullet, asteroid) {
     asteroidExplosion.anchor.setTo(0.5, 0.5);
     asteroidExplosion.animations.add('explode', [], 30);
     asteroidExplosion.animations.play('explode');
+    asteroidSound.play();
     incrementScore(10);
 }
 
@@ -396,6 +402,7 @@ function incrementScore(incrementAmount) {
 function gameOver() {
     ship.alive = false;
     ship.destroy();
+    alertSound.stop();
     explodeShip = game.add.sprite(ship.x, ship.y, 'shipExplosion');
     explodeShip.anchor.setTo(0.5, 0.5);
     explodeShip.animations.add('anim', [], 30);
