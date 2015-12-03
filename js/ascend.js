@@ -371,7 +371,7 @@ function baddieRelease3() {
     platformCrashSound.play();
 }
 
-// have baddies descend after they complete a loop in their movement
+// have baddies move down
 function descend1() {
     badGuy1.y += 2;
 	badGuy2.y += 2;
