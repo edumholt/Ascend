@@ -40,7 +40,6 @@ function preload() {
     game.load.image('baddie1', 'assets/andriodShip.png');
     game.load.image('baddie2', 'assets/alien3.png'); 
     game.load.image('baddie3', 'assets/spaceShip.png'); 
-    game.load.image('baddie4', 'assets/gunship.png'); 
     game.load.spritesheet('asteroid', 'assets/asteroid.png', 36, 36);
     game.load.spritesheet('ship', 'assets/ship_sprites.png', 45, 52);
     game.load.spritesheet('shipExplosion', 'assets/explosion.png', 100, 100);
@@ -104,48 +103,46 @@ function create() {
     platforms.setAll('anchor.y', 0.5);
     platforms.setAll('checkWorldBounds', true);
     platforms.setAll('outOfBoundsKill', true);
-    
-    platformOne = platforms.create(50, 1, 'platform');
-    platformOne.body.immovable = true;
-    platformOne.body.velocity.y = 30;
-    
-    platformTwo = platforms.create(500, -45, 'platform');
-    platformTwo.body.immovable = true;
-    platformTwo.body.velocity.y = 30;
 	
-	platformThree = platforms.create(275, -250, 'platform');
-    platformThree.body.immovable = true;
-    platformThree.body.velocity.y = 30;
+	platformCreate(); 
 
     // Create baddies group
-    baddies = game.add.group();
-    baddies.enableBody = true;
-    baddies.physicsBodyType = Phaser.Physics.ARCADE;
+    baddies1 = game.add.group();
+    baddies1.enableBody = true;
+    baddies1.physicsBodyType = Phaser.Physics.ARCADE;
     
-    baddies.setAll('anchor.x', 0.5);
-    baddies.setAll('anchor.y', 0.5);
-    baddies.setAll('checkWorldBounds', true);
-    baddies.setAll('outOfBoundsKill', true);
-    
-    badGuy1 = baddies.create(platformOne.x, platformOne.y - 45, 'baddie1');
-    badGuy1.body.velocity.y = 30;
-    
-    badGuy2 = baddies.create(platformOne.x + 200, platformOne.y - 65, 'baddie2');
-    badGuy2.body.velocity.y = 30;
-    
-    badGuy3 = baddies.create(platformTwo.x + +25, platformTwo.y - 45, 'baddie3');
-    badGuy3.body.velocity.y = 30;
-    
-    badGuy4 = baddies.create(platformTwo.x + 175, platformTwo.y - 40, 'baddie4');
-    badGuy4.body.velocity.y = 30;
+    baddies1.setAll('anchor.x', 0.5);
+    baddies1.setAll('anchor.y', 0.5);
+    baddies1.setAll('checkWorldBounds', true);
+    baddies1.setAll('outOfBoundsKill', true);
 	
-	badGuy5 = baddies.create(platformThree.x, platformThree.y - 45, 'baddie1');
-    badGuy5.body.velocity.y = 30;
+	baddies2 = game.add.group();
+    baddies2.enableBody = true;
+    baddies2.physicsBodyType = Phaser.Physics.ARCADE;
+    
+    baddies2.setAll('anchor.x', 0.5);
+    baddies2.setAll('anchor.y', 0.5);
+    baddies2.setAll('checkWorldBounds', true);
+    baddies2.setAll('outOfBoundsKill', true);
 	
-	badGuy6 = baddies.create(platformThree.x + 175, platformThree.y - 45, 'baddie3');
-    badGuy6.body.velocity.y = 30;
-
+	baddies3 = game.add.group();
+    baddies3.enableBody = true;
+    baddies3.physicsBodyType = Phaser.Physics.ARCADE;
+    
+    baddies3.setAll('anchor.x', 0.5);
+    baddies3.setAll('anchor.y', 0.5);
+    baddies3.setAll('checkWorldBounds', true);
+    baddies3.setAll('outOfBoundsKill', true);
+	
+	createBaddies();
+    
     dangerZone = game.add.sprite(0, game.height - 50, 'dangerZone');
+	
+	// Create a pool of explosions
+    explosions = game.add.group();
+    explosions.createMultiple(300, 'shipExplosion');
+	
+	explosions.forEach(setupBaddie, this);
 
     // Game controls
     cursors = game.input.keyboard.createCursorKeys();
@@ -165,23 +162,59 @@ function create() {
 
 }
 
+function platformCreate() {
+	
+	platformOne = platforms.create(50, 1, 'platform');
+    platformOne.body.immovable = true;
+    platformOne.body.velocity.y = 30;
+    
+    platformTwo = platforms.create(500, -45, 'platform');
+    platformTwo.body.immovable = true;
+    platformTwo.body.velocity.y = 30;
+	
+	platformThree = platforms.create(275, -250, 'platform');
+    platformThree.body.immovable = true;
+    platformThree.body.velocity.y = 30;
+}
+
+function createBaddies() {
+	for (var i = 0; i < numEnemies; i++) {
+		
+		badGuy1 = baddies1.create(platformOne.x + i * 175, platformOne.y - 45, 'baddie1');
+    	badGuy1.body.velocity.y = 30;
+		
+		badGuy2 = baddies2.create(platformTwo.x + i * 200, platformTwo.y - 65, 'baddie2');
+    	badGuy2.body.velocity.y = 30;
+		
+		badGuy3 = baddies3.create(platformThree.x + i * 175, platformThree.y - 45, 'baddie3');
+    	badGuy3.body.velocity.y = 30;	
+		
+	}
+}
+
+function setupBaddie(baddieExplosion) {
+    
+    baddieExplosion.anchor.setTo(0.5, 0.5);
+    baddieExplosion.animations.add('kaboomExplosion');
+	
+}
+	
 function update() {
     
     // Collisions
     game.physics.arcade.collide(ship, platformOne, baddieRelease, null, this);
     game.physics.arcade.collide(ship, platformTwo, baddieRelease2, null, this);
     game.physics.arcade.collide(ship, platformThree, baddieRelease3, null, this);
-    game.physics.arcade.collide(baddies, platforms);
+    game.physics.arcade.collide(baddies1, platforms);
+    game.physics.arcade.collide(baddies2, platforms);
+    game.physics.arcade.collide(baddies3, platforms);
     game.physics.arcade.collide(bullets, platforms, platformShot, null, this);
     
 	// Collisions to kill enemies
 	// still working on fixing this so its less code
-	game.physics.arcade.collide(bullets, badGuy1, baddieOneKill, null, this);
-    game.physics.arcade.collide(bullets, badGuy2, baddieTwoKill, null, this);
-    game.physics.arcade.collide(bullets, badGuy3, baddieThreeKill, null, this);    
-    game.physics.arcade.collide(bullets, badGuy4, baddieFourKill, null, this);
-    game.physics.arcade.collide(bullets, badGuy5, baddieFiveKill, null, this);
-    game.physics.arcade.collide(bullets, badGuy6, baddieSixKill, null, this);
+	game.physics.arcade.collide(bullets, baddies1, baddieOneKill, null, this);
+    game.physics.arcade.collide(bullets, baddies2, baddieTwoKill, null, this);
+    game.physics.arcade.collide(bullets, baddies3, baddieThreeKill, null, this);    ;
    
 	game.physics.arcade.collide(bullets, asteroids, asteroidExplode, null, this);
     starfield.tilePosition.y += 0.4;
@@ -225,46 +258,20 @@ function update() {
     }
     
    // Revive Platforms and enemies after they are gone
-    if(!platforms.countLiving() && !baddies.countLiving()) {
+	
+	
+    if(!baddies1.countLiving() && !baddies2.countLiving() && !baddies3.countLiving()) {
         
         game.tweens.removeAll();
 		
 		// Bring back platformOne with its baddies
-		platformOne = platforms.create(50, 1, 'platform');
-		platformOne.body.immovable = true;
-		platformOne.body.velocity.y = 30;
 		
-		badGuy1 = baddies.create(platformOne.x, platformOne.y - 45, 'baddie1');
-    	badGuy1.body.velocity.y = 30;
-   	 
-		badGuy2 = baddies.create(platformOne.x + 200, platformOne.y - 65, 'baddie2');
-		badGuy2.body.velocity.y = 30;
+		platformCreate();
 		
-		// Bring back platformTwo with its baddies
-		platformTwo = platforms.create(500, -45, 'platform')
-		platformTwo.body.immovable = true;
-		platformTwo.body.velocity.y = 30;;
-    
-		badGuy3 = baddies.create(platformTwo.x + +25, platformTwo.y - 45, 'baddie3');
-    	badGuy3.body.velocity.y = 30;
-    
-    	badGuy4 = baddies.create(platformTwo.x + 175, platformTwo.y - 40, 'baddie4');
-		badGuy4.body.velocity.y = 30;
-		
-		// Bring back platformThree with its baddies
-		platformThree = platforms.create(275, -250, 'platform');
-		platformThree.body.immovable = true;
-		platformThree.body.velocity.y = 30;
-		
-		
-		badGuy5 = baddies.create(platformThree.x, platformThree.y - 45, 'baddie1');
-		badGuy5.body.velocity.y = 30;
-	
-		badGuy6 = baddies.create(platformThree.x + 175, platformThree.y - 45, 'baddie3');
-    	badGuy6.body.velocity.y = 30;
+		createBaddies();
     }
     
-	if(platformOne.y >= game.world.height - 50 ) {
+/*	if(platformOne.y >= game.world.height - 50 ) {
     	platformOne.kill();
    }
 	
@@ -286,19 +293,7 @@ function update() {
 	
 	if(badGuy3.y >= game.world.height - 50 ) {
         badGuy3.kill();
-    }
-	
-	if(badGuy4.y >= game.world.height - 50 ) {
-        badGuy4.kill();
-    }
-	
-	if(badGuy5.y >= game.world.height - 50 ) {
-        badGuy5.kill();
-    }
-	
-	if(badGuy6.y >= game.world.height - 50 ) {
-        badGuy6.kill();
-    }
+    }*/
 
 }
 
@@ -336,99 +331,65 @@ function fireBullet() {
 // Have baddies become active once platform is collided with
 // And play sound for platform and ship collision
 function baddieRelease() {
-    badGuy1.body.velocity.y = 0;
-    badGuy2.body.velocity.y = 0;
-    
-    tween1 = game.add.tween(badGuy1).to({x: 250}, 2000, Phaser.Easing.Linear.None, true, 0, 500, true);
-    tween1.onLoop.add(descend1, this);
-    
-    tween2 = game.add.tween(badGuy2).to({x: 390}, 2000, Phaser.Easing.Linear.None, true, 0, 500, true);
-    
+	platformOne.kill();
+    badGuy1.body.velocity.y = 5;
+
+    tween1 = game.add.tween(baddies1).to({x: 200}, 2000, Phaser.Easing.Linear.None, true, 0, 500, true);
+
     platformCrashSound.play(); 
 }
 
 function baddieRelease2() {
-    badGuy3.body.velocity.y = 0;
-    badGuy4.body.velocity.y = 0;
-    
-    tween3 = game.add.tween(badGuy3).to({x: 405}, 2000, Phaser.Easing.Linear.None, true, 0, 500, true);
-    tween3.onLoop.add(descend2, this);
-    
-    tween4 = game.add.tween(badGuy4).to({x: 250}, 2000, Phaser.Easing.Linear.None, true, 0, 500, true);
-    
+	platformTwo.kill();
+    badGuy2.body.velocity.y = 5;
+
+    tween2 = game.add.tween(baddies2).to({x: -250}, 2000, Phaser.Easing.Linear.None, true, 0, 500, true);
+
     platformCrashSound.play(); 
 }
 
 function baddieRelease3() {
-    badGuy5.body.velocity.y = 0;
-    badGuy6.body.velocity.y = 0;
+	platformThree.kill();
+	
+    badGuy3.body.velocity.y = 5;
     
-    tween5 = game.add.tween(badGuy5).to({x: 50}, 2000, Phaser.Easing.Linear.None, true, 0, 500, true);
-    tween5.onLoop.add(descend3, this);
-    
-    tween6 = game.add.tween(badGuy6).to({x: 600}, 2000, Phaser.Easing.Linear.None, true, 0, 500, true);
-    
+    tween3 = game.add.tween(baddies3).to({x: -75}, 2000, Phaser.Easing.Linear.None, true, 0, 500, true);
+	
     platformCrashSound.play();
 }
 
-// have baddies move down
-function descend1() {
-    badGuy1.y += 2;
-	badGuy2.y += 2;
-}
-
-function descend2() {
-    badGuy3.y += 2;
-	badGuy4.y += 2;
-}
-
-function descend3() {
-    badGuy5.y += 2;
-	badGuy6.y += 2;
-}
-
-
 // Kill baddies after collision with bullets
-function baddieOneKill() {
+function baddieOneKill(bullet, badGuy1) {
     badGuy1.kill();
     bullet.kill();
-    explodeBaddie = game.add.sprite(badGuy1.x, badGuy1.y, 'shipExplosion');
-    enemyExplosionAnim();
+	
+	explosion = explosions.getFirstExists(false);
+	explosion.reset(badGuy1.body.x, badGuy1.y);
+	explosion.play('kaboomExplosion', 30, false, true);
+	
+	 incrementScore(30);
 }
 
-function baddieTwoKill() {
+function baddieTwoKill(bullet, badGuy2) {
     badGuy2.kill();
     bullet.kill();
-    explodeBaddie = game.add.sprite(badGuy2.x, badGuy2.y, 'shipExplosion');
-    enemyExplosionAnim();
+	
+	explosion = explosions.getFirstExists(false);
+	explosion.reset(badGuy2.body.x, badGuy2.y);
+	explosion.play('kaboomExplosion', 30, false, true);
+	
+	 incrementScore(30);
 }
 
-function baddieThreeKill() {
+function baddieThreeKill(bullet, badGuy3) {
     badGuy3.kill();
     bullet.kill();
-    explodeBaddie = game.add.sprite(badGuy3.x, badGuy3.y, 'shipExplosion');
-    enemyExplosionAnim();
-}
-
-function baddieFourKill() {
-    badGuy4.kill();
-    bullet.kill();
-    explodeBaddie = game.add.sprite(badGuy4.x, badGuy4.y, 'shipExplosion');
-    enemyExplosionAnim();
-}
-
-function baddieFiveKill() {
-    badGuy5.kill();
-    bullet.kill();
-    explodeBaddie = game.add.sprite(badGuy5.x, badGuy5.y, 'shipExplosion');
-    enemyExplosionAnim();
-}
-
-function baddieSixKill() {
-    badGuy6.kill();
-    bullet.kill();
-    explodeBaddie = game.add.sprite(badGuy6.x, badGuy6.y, 'shipExplosion');
-    enemyExplosionAnim();
+	
+	explosion = explosions.getFirstExists(false);
+	explosion.reset(badGuy3.body.x, badGuy3.y);
+	explosion.play('kaboomExplosion', 30, false, true);
+	
+	 incrementScore(30);
 }
 
 // function to shorten enemy eplosion code
