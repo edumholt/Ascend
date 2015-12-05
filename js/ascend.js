@@ -1,6 +1,9 @@
 var game = new Phaser.Game(800, 600, Phaser.AUTO, '', {preload: preload, create: create, update: update});
 
-var asteroids,
+var alertSound,
+    alertTimer = 0,
+    asteroidCrashSound,
+    asteroids,
     asteroidExplosion,
     bgSound,
     bellSound,
@@ -58,6 +61,7 @@ function preload() {
     game.load.audio('platformShot', 'assets/platformShot.mp3');
     game.load.audio('expl', 'assets/expl.mp3');
     game.load.audio('alert', 'assets/intruderAlert.mp3');
+    game.load.audio('asteroidCrash', 'assets/asteroidCrash.mp3');
     game.load.audio('asteroidExplosion', 'assets/asteroidExplosion.mp3');
     game.load.audio('bell', 'assets/bell.mp3');
     game.load.audio('lose', 'assets/youLose.mp3');
@@ -177,6 +181,7 @@ function create() {
     platformShotSound = game.add.audio('platformShot');
     enemyBoom = game.add.audio('expl');
     alertSound = game.add.audio('alert');
+    asteroidCrashSound = game.add.audio('asteroidCrash');
     asteroidSound = game.add.audio('asteroidExplosion');
     bellSound = game.add.audio('bell');
     loseSound = game.add.audio('lose');
@@ -237,6 +242,11 @@ function update() {
 
     if(ship.y >= game.world.height - 160) {
         warningText.text = "WARNING: ACCELERATE SHIP";
+        if(game.time.now > alertTimer) {
+            alertSound.play();
+            alertTimer = game.time.now + 2000;
+        }
+
     } else {
         warningText.text = '';
     }
@@ -367,7 +377,7 @@ function setupBaddie(baddieExplosion) {
 // And play sound for platform and ship collision
 function baddieRelease() {
 	platformOne.kill();
-    badGuy1.body.velocity.y = 5;
+    badGuy1.body.velocity.y = -5;
 
     tween1 = game.add.tween(baddies1).to({x: 200}, 2000, Phaser.Easing.Linear.None, true, 0, 500, true);
 
@@ -376,7 +386,7 @@ function baddieRelease() {
 
 function baddieRelease2() {
 	platformTwo.kill();
-    badGuy2.body.velocity.y = 5;
+    badGuy2.body.velocity.y = -5;
 
     tween2 = game.add.tween(baddies2).to({x: -250}, 2000, Phaser.Easing.Linear.None, true, 0, 500, true);
 
@@ -386,7 +396,7 @@ function baddieRelease2() {
 function baddieRelease3() {
 	platformThree.kill();
 	
-    badGuy3.body.velocity.y = 5;
+    badGuy3.body.velocity.y = -5;
     
     tween3 = game.add.tween(baddies3).to({x: -75}, 2000, Phaser.Easing.Linear.None, true, 0, 500, true);
 	
@@ -469,6 +479,7 @@ function checkLives(){
     // to avoid multiple short collisions
     if(game.time.now > livesTimer) {
         if(lives > 0) {
+            asteroidCrashSound.play();
             lives--;
             livesText.text = "LIVES: " + lives;
             livesTimer = game.time.now + 500;
@@ -479,12 +490,12 @@ function checkLives(){
 }
 
 function gameOver() {
+    console.log("Entering gameOver()...");
     bgSound.stop();
     enemyBoom.play();
     livesText.text = "GAME OVER"
     ship.alive = false;
     ship.destroy();
-    alertSound.stop();
     explodeShip = game.add.sprite(ship.x, ship.y, 'shipExplosion');
     explodeShip.anchor.setTo(0.5, 0.5);
     explodeShip.animations.add('anim', [], 30);
