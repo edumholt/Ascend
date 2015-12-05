@@ -10,8 +10,12 @@ var asteroids,
     dangerZone,
     explodeShip,
     fireButton,
+    lives = 3,
+    livesText,
+    livesTimer = 0,
 	numEnemies = 2,
     platforms,
+    safeFlag = true,
     score = 0,
     scoreText,
     warningText,
@@ -162,43 +166,6 @@ function create() {
 
 }
 
-function platformCreate() {
-	
-	platformOne = platforms.create(50, 1, 'platform');
-    platformOne.body.immovable = true;
-    platformOne.body.velocity.y = 30;
-    
-    platformTwo = platforms.create(500, -45, 'platform');
-    platformTwo.body.immovable = true;
-    platformTwo.body.velocity.y = 30;
-	
-	platformThree = platforms.create(275, -250, 'platform');
-    platformThree.body.immovable = true;
-    platformThree.body.velocity.y = 30;
-}
-
-function createBaddies() {
-	for (var i = 0; i < numEnemies; i++) {
-		
-		badGuy1 = baddies1.create(platformOne.x + i * 175, platformOne.y - 45, 'baddie1');
-    	badGuy1.body.velocity.y = 30;
-		
-		badGuy2 = baddies2.create(platformTwo.x + i * 200, platformTwo.y - 65, 'baddie2');
-    	badGuy2.body.velocity.y = 30;
-		
-		badGuy3 = baddies3.create(platformThree.x + i * 175, platformThree.y - 45, 'baddie3');
-    	badGuy3.body.velocity.y = 30;	
-		
-	}
-}
-
-function setupBaddie(baddieExplosion) {
-    
-    baddieExplosion.anchor.setTo(0.5, 0.5);
-    baddieExplosion.animations.add('kaboomExplosion');
-	
-}
-	
 function update() {
     
     // Collisions
@@ -209,14 +176,14 @@ function update() {
     game.physics.arcade.collide(baddies2, platforms);
     game.physics.arcade.collide(baddies3, platforms);
     game.physics.arcade.collide(bullets, platforms, platformShot, null, this);
+	game.physics.arcade.collide(bullets, asteroids, asteroidExplode, null, this);
+    game.physics.arcade.collide(ship, asteroids, checkLives, null, this);
     
 	// Collisions to kill enemies
 	// still working on fixing this so its less code
 	game.physics.arcade.collide(bullets, baddies1, baddieOneKill, null, this);
     game.physics.arcade.collide(bullets, baddies2, baddieTwoKill, null, this);
-    game.physics.arcade.collide(bullets, baddies3, baddieThreeKill, null, this);    ;
-   
-	game.physics.arcade.collide(bullets, asteroids, asteroidExplode, null, this);
+    game.physics.arcade.collide(bullets, baddies3, baddieThreeKill, null, this);
     starfield.tilePosition.y += 0.4;
 
     createRandomAsteroid();
@@ -253,8 +220,9 @@ function update() {
         warningText.text = '';
     }
 
-    if(ship.y >= game.world.height - 50 ) {
+    if(ship.y >= game.world.height - 50 && safeFlag) {
         gameOver();
+        safeFlag = false;
     }
     
    // Revive Platforms and enemies after they are gone
@@ -299,6 +267,7 @@ function update() {
 
 function createText() {
     scoreText = game.add.text(16, 16, "SCORE: 0", {font: '400 24px Audiowide', fill: '#9F9'});
+    livesText = game.add.text(660, 16, "LIVES: 3", {font: '400 24px Audiowide', fill: '#9F9'});
 }
 
 function createRandomAsteroid() {
@@ -325,6 +294,43 @@ function fireBullet() {
             bulletTime = game.time.now + 200;
         }
     }
+
+}
+
+function platformCreate() {
+
+	platformOne = platforms.create(50, 1, 'platform');
+    platformOne.body.immovable = true;
+    platformOne.body.velocity.y = 30;
+
+    platformTwo = platforms.create(500, -45, 'platform');
+    platformTwo.body.immovable = true;
+    platformTwo.body.velocity.y = 30;
+
+	platformThree = platforms.create(275, -250, 'platform');
+    platformThree.body.immovable = true;
+    platformThree.body.velocity.y = 30;
+}
+
+function createBaddies() {
+	for (var i = 0; i < numEnemies; i++) {
+
+		badGuy1 = baddies1.create(platformOne.x + i * 175, platformOne.y - 45, 'baddie1');
+    	badGuy1.body.velocity.y = 30;
+
+		badGuy2 = baddies2.create(platformTwo.x + i * 200, platformTwo.y - 65, 'baddie2');
+    	badGuy2.body.velocity.y = 30;
+
+		badGuy3 = baddies3.create(platformThree.x + i * 175, platformThree.y - 45, 'baddie3');
+    	badGuy3.body.velocity.y = 30;
+
+	}
+}
+
+function setupBaddie(baddieExplosion) {
+
+    baddieExplosion.anchor.setTo(0.5, 0.5);
+    baddieExplosion.animations.add('kaboomExplosion');
 
 }
 
@@ -367,7 +373,7 @@ function baddieOneKill(bullet, badGuy1) {
 	explosion.reset(badGuy1.body.x, badGuy1.y);
 	explosion.play('kaboomExplosion', 30, false, true);
 	
-	 incrementScore(30);
+    incrementScore(30);
 }
 
 function baddieTwoKill(bullet, badGuy2) {
@@ -378,7 +384,7 @@ function baddieTwoKill(bullet, badGuy2) {
 	explosion.reset(badGuy2.body.x, badGuy2.y);
 	explosion.play('kaboomExplosion', 30, false, true);
 	
-	 incrementScore(30);
+	incrementScore(30);
 }
 
 function baddieThreeKill(bullet, badGuy3) {
@@ -389,7 +395,7 @@ function baddieThreeKill(bullet, badGuy3) {
 	explosion.reset(badGuy3.body.x, badGuy3.y);
 	explosion.play('kaboomExplosion', 30, false, true);
 	
-	 incrementScore(30);
+	incrementScore(30);
 }
 
 // function to shorten enemy eplosion code
@@ -421,6 +427,21 @@ function platformShot(bullet) {
 function incrementScore(incrementAmount) {
     score += incrementAmount;
     scoreText.text = 'SCORE: ' + score;
+}
+
+function checkLives(){
+    // to avoid multiple short collisions
+    if(game.time.now > livesTimer) {
+        console.log("going into checkLives()");
+        if(lives > 0) {
+            lives--;
+            console.log("the value: " + lives);
+            livesText.text = "LIVES: " + lives;
+            livesTimer = game.time.now + 500;
+        } else {
+            gameOver();
+        }
+    }
 }
 
 function gameOver() {
