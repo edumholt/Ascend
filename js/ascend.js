@@ -80,7 +80,7 @@ function create() {
 
     game.physics.startSystem(Phaser.Physics.ARCADE);
 
-    starfield = game.add.tileSprite(0, 0, 800, 620, 'starfield');
+    starfield = game.add.tileSprite(0, 20, 800, 620, 'starfield');
 
     ship = game.add.sprite(400, 300, 'ship');
     game.physics.arcade.enable(ship);
@@ -165,7 +165,7 @@ function create() {
 	
 	createBaddies();
     
-    dangerZone = game.add.sprite(0, game.height - 50, 'dangerZone');
+    dangerZone = game.add.sprite(0, game.height - 30, 'dangerZone');
 	
 	// Create a pool of explosions
     explosions = game.add.group();
@@ -301,7 +301,6 @@ function update() {
 }
 
 function render() {
-    game.debug.cameraInfo(game.camera, 16, 200);
 }
 
 function createText() {
@@ -385,7 +384,7 @@ function setupBaddie(baddieExplosion) {
 // And play sound for platform and ship collision
 function baddieRelease() {
 	platformOne.kill();
-    badGuy1.body.velocity.y = -5;
+    badGuy1.body.velocity.y = -10;
 
     tween1 = game.add.tween(baddies1).to({x: 200}, 2000, Phaser.Easing.Linear.None, true, 0, 500, true);
 
@@ -395,7 +394,7 @@ function baddieRelease() {
 
 function baddieRelease2() {
 	platformTwo.kill();
-    badGuy2.body.velocity.y = -5;
+    badGuy2.body.velocity.y = -10;
 
     tween2 = game.add.tween(baddies2).to({x: -250}, 2000, Phaser.Easing.Linear.None, true, 0, 500, true);
 
@@ -406,7 +405,7 @@ function baddieRelease2() {
 function baddieRelease3() {
 	platformThree.kill();
 	
-    badGuy3.body.velocity.y = -5;
+    badGuy3.body.velocity.y = -10;
     
     tween3 = game.add.tween(baddies3).to({x: -75}, 2000, Phaser.Easing.Linear.None, true, 0, 500, true);
 	
