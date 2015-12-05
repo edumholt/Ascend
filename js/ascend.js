@@ -3,6 +3,7 @@ var game = new Phaser.Game(800, 600, Phaser.AUTO, '', {preload: preload, create:
 var asteroids,
     asteroidExplosion,
     bgSound,
+    bellSound,
     bulletSound,
     bullets,
     bulletTime = 0,
@@ -58,6 +59,7 @@ function preload() {
     game.load.audio('expl', 'assets/expl.mp3');
     game.load.audio('alert', 'assets/intruderAlert.mp3');
     game.load.audio('asteroidExplosion', 'assets/asteroidExplosion.mp3');
+    game.load.audio('bell', 'assets/bell.mp3');
     
 
     // Load Google web font 'Audiowide'
@@ -176,6 +178,7 @@ function create() {
     enemyBoom = game.add.audio('expl');
     alertSound = game.add.audio('alert');
     asteroidSound = game.add.audio('asteroidExplosion');
+    bellSound = game.add.audio('bell');
     bgSound.play('', 0, 1, true);
 
 }
@@ -456,6 +459,7 @@ function incrementScore(incrementAmount) {
 
 function addLives(ship, beacon) {
     beacon.kill();
+    bellSound.play();
     lives++;
     livesText.text = "LIVES: " + lives;
 }
