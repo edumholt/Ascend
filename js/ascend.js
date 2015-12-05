@@ -267,7 +267,7 @@ function update() {
 
 function createText() {
     scoreText = game.add.text(16, 16, "SCORE: 0", {font: '400 24px Audiowide', fill: '#9F9'});
-    livesText = game.add.text(660, 16, "LIVES: 3", {font: '400 24px Audiowide', fill: '#9F9'});
+    livesText = game.add.text(620, 16, "LIVES: 3", {font: '400 24px Audiowide', fill: '#9F9'});
 }
 
 function createRandomAsteroid() {
@@ -432,10 +432,8 @@ function incrementScore(incrementAmount) {
 function checkLives(){
     // to avoid multiple short collisions
     if(game.time.now > livesTimer) {
-        console.log("going into checkLives()");
         if(lives > 0) {
             lives--;
-            console.log("the value: " + lives);
             livesText.text = "LIVES: " + lives;
             livesTimer = game.time.now + 500;
         } else {
@@ -445,6 +443,7 @@ function checkLives(){
 }
 
 function gameOver() {
+    livesText.text = "GAME OVER"
     ship.alive = false;
     ship.destroy();
     alertSound.stop();
