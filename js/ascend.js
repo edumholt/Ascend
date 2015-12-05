@@ -6,8 +6,10 @@ var asteroids,
     bulletSound,
     bullets,
     bulletTime = 0,
+    beacons,
     cursors,
     dangerZone,
+    expl,
     explodeShip,
     fireButton,
     lives = 3,
@@ -45,6 +47,7 @@ function preload() {
     game.load.image('baddie2', 'assets/alien3.png'); 
     game.load.image('baddie3', 'assets/spaceShip.png'); 
     game.load.spritesheet('asteroid', 'assets/asteroid.png', 36, 36);
+    game.load.spritesheet('beacon', 'assets/beacon.png', 36, 21);
     game.load.spritesheet('ship', 'assets/ship_sprites.png', 45, 52);
     game.load.spritesheet('shipExplosion', 'assets/explosion.png', 100, 100);
     game.load.spritesheet('asteroidExplosion', 'assets/asteroidExplosion.png', 64, 64);
@@ -97,6 +100,17 @@ function create() {
     asteroids.setAll('outOfBoundsKill', true);
     asteroids.setAll('checkWorldBounds', true);
     
+    // Create beacon group
+    beacons = game.add.group();
+    beacons.enableBody = true;
+    beacons.physicsBodyType = Phaser.Physics.ARCADE;
+
+    beacons.setAll('anchor.x', 0.5);
+    beacons.setAll('anchor.y', 0.5);
+    beacons.setAll('outOfBoundsKill', true);
+    beacons.setAll('checkWorldBounds', true);
+
+
     // Create platforms group
     platforms = game.add.group();
     platforms.enableBody = true;
@@ -178,6 +192,8 @@ function update() {
     game.physics.arcade.collide(bullets, platforms, platformShot, null, this);
 	game.physics.arcade.collide(bullets, asteroids, asteroidExplode, null, this);
     game.physics.arcade.collide(ship, asteroids, checkLives, null, this);
+    game.physics.arcade.overlap(ship, beacons, addLives, null, this);
+
     
 	// Collisions to kill enemies
 	// still working on fixing this so its less code
@@ -187,6 +203,7 @@ function update() {
     starfield.tilePosition.y += 0.4;
 
     createRandomAsteroid();
+    createRandomBeacon();
 
     if(!(cursors.left.isDown || cursors.right.isDown || cursors.up.isDown)) {
         ship.animations.stop();
@@ -279,6 +296,14 @@ function createRandomAsteroid() {
         asteroid.play('spin');
     }
 
+}
+
+function createRandomBeacon() {
+
+    if(Math.random() < .001) {
+        var beacon = beacons.create(Math.random() * 700 + 50, 0, 'beacon', 1);
+        beacon.body.velocity.setTo(Math.random() * 50 - 30, Math.random() * 30 + 40);
+    }
 }
 
 function fireBullet() {
@@ -429,6 +454,12 @@ function incrementScore(incrementAmount) {
     scoreText.text = 'SCORE: ' + score;
 }
 
+function addLives(ship, beacon) {
+    beacon.kill();
+    lives++;
+    livesText.text = "LIVES: " + lives;
+}
+
 function checkLives(){
     // to avoid multiple short collisions
     if(game.time.now > livesTimer) {
@@ -443,6 +474,8 @@ function checkLives(){
 }
 
 function gameOver() {
+    bgSound.stop();
+    enemyBoom.play();
     livesText.text = "GAME OVER"
     ship.alive = false;
     ship.destroy();
