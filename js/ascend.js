@@ -310,7 +310,7 @@ function createText() {
 
 function createRandomAsteroid() {
 
-    if(Math.random() < .003) {
+    if(Math.random() < .004) {
         var asteroid = asteroids.create(Math.random() * 600 + 100, 0, 'asteroid', 1);
         asteroid.body.velocity.setTo(Math.random() * 60 - 30, Math.random() * 30 + 20);
         asteroid.animations.add('spin', [], 10, true);
@@ -321,7 +321,7 @@ function createRandomAsteroid() {
 
 function createRandomBeacon() {
 
-    if(Math.random() < .001) {
+    if(Math.random() < .0003) {
         var beacon = beacons.create(Math.random() * 700 + 50, 0, 'beacon', 1);
         beacon.body.velocity.setTo(Math.random() * 50 - 30, Math.random() * 30 + 40);
     }
@@ -499,12 +499,13 @@ function addLives(ship, beacon) {
 function checkLives(){
     // to avoid multiple short collisions
     if(game.time.now > livesTimer) {
+        lives--;
         if(lives > 0) {
             asteroidCrashSound.play();
-            lives--;
             livesText.text = "LIVES: " + lives;
             livesTimer = game.time.now + 500;
         } else {
+            console.log("calling gameOver() from else statement");
             gameOver();
         }
     }
@@ -515,11 +516,11 @@ function gameOver() {
     bgSound.stop();
     enemyBoom.play();
     livesText.text = "GAME OVER"
-    ship.alive = false;
-    ship.destroy();
     explodeShip = game.add.sprite(ship.x, ship.y, 'shipExplosion');
     explodeShip.anchor.setTo(0.5, 0.5);
     explodeShip.animations.add('anim', [], 30);
     explodeShip.animations.play('anim');
     loseSound.play();
+    ship.alive = false;
+    ship.kill();
 }
