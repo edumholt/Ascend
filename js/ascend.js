@@ -60,7 +60,7 @@ function preload() {
     game.load.audio('alert', 'assets/intruderAlert.mp3');
     game.load.audio('asteroidExplosion', 'assets/asteroidExplosion.mp3');
     game.load.audio('bell', 'assets/bell.mp3');
-    
+    game.load.audio('lose', 'assets/youLose.mp3');
 
     // Load Google web font 'Audiowide'
     game.load.script('webfont', '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');
@@ -179,6 +179,7 @@ function create() {
     alertSound = game.add.audio('alert');
     asteroidSound = game.add.audio('asteroidExplosion');
     bellSound = game.add.audio('bell');
+    loseSound = game.add.audio('lose');
     bgSound.play('', 0, 1, true);
 
 }
@@ -488,4 +489,5 @@ function gameOver() {
     explodeShip.anchor.setTo(0.5, 0.5);
     explodeShip.animations.add('anim', [], 30);
     explodeShip.animations.play('anim');
+    loseSound.play();
 }
