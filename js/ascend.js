@@ -1,4 +1,4 @@
-var game = new Phaser.Game(800, 600, Phaser.AUTO, '', {preload: preload, create: create, update: update});
+var game = new Phaser.Game(800, 620, Phaser.AUTO, '', {preload: preload, create: create, update: update, render: render});
 
 var alertSound,
     alertTimer = 0,
@@ -11,6 +11,8 @@ var alertSound,
     bullets,
     bulletTime = 0,
     beacons,
+    cameraShakeTime = 0,
+    cameraView,
     cursors,
     dangerZone,
     expl,
@@ -69,13 +71,16 @@ function preload() {
     // Load Google web font 'Audiowide'
     game.load.script('webfont', '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');
 
+    cameraView = new Phaser.Rectangle(0, 20, 800, 600);
+    game.camera.view = cameraView;
+
 }
 
 function create() {
 
     game.physics.startSystem(Phaser.Physics.ARCADE);
 
-    starfield = game.add.tileSprite(0, 0, 800, 600, 'starfield');
+    starfield = game.add.tileSprite(0, 0, 800, 620, 'starfield');
 
     ship = game.add.sprite(400, 300, 'ship');
     game.physics.arcade.enable(ship);
@@ -172,7 +177,7 @@ function create() {
     cursors = game.input.keyboard.createCursorKeys();
     fireButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 
-    warningText = game.add.text(16, 56, '', {font: '400 20px Audiowide', fill: '#F33', align: 'center'});
+    warningText = game.add.text(16, 76, '', {font: '400 20px Audiowide', fill: '#F33', align: 'center'});
 
     // Add Sounds
     bulletSound = game.add.audio('bulletSound');
@@ -203,7 +208,6 @@ function update() {
     game.physics.arcade.collide(ship, asteroids, checkLives, null, this);
     game.physics.arcade.overlap(ship, beacons, addLives, null, this);
 
-    
 	// Collisions to kill enemies
 	// still working on fixing this so its less code
 	game.physics.arcade.collide(bullets, baddies1, baddieOneKill, null, this);
@@ -296,9 +300,13 @@ function update() {
 
 }
 
+function render() {
+    game.debug.cameraInfo(game.camera, 16, 200);
+}
+
 function createText() {
-    scoreText = game.add.text(16, 16, "SCORE: 0", {font: '400 24px Audiowide', fill: '#9F9'});
-    livesText = game.add.text(620, 16, "LIVES: 3", {font: '400 24px Audiowide', fill: '#9F9'});
+    scoreText = game.add.text(16, 36, "SCORE: 0", {font: '400 24px Audiowide', fill: '#9F9'});
+    livesText = game.add.text(620, 36, "LIVES: 3", {font: '400 24px Audiowide', fill: '#9F9'});
 }
 
 function createRandomAsteroid() {
@@ -382,6 +390,7 @@ function baddieRelease() {
     tween1 = game.add.tween(baddies1).to({x: 200}, 2000, Phaser.Easing.Linear.None, true, 0, 500, true);
 
     platformCrashSound.play(); 
+    cameraShake();
 }
 
 function baddieRelease2() {
@@ -391,6 +400,7 @@ function baddieRelease2() {
     tween2 = game.add.tween(baddies2).to({x: -250}, 2000, Phaser.Easing.Linear.None, true, 0, 500, true);
 
     platformCrashSound.play(); 
+    cameraShake();
 }
 
 function baddieRelease3() {
@@ -401,6 +411,7 @@ function baddieRelease3() {
     tween3 = game.add.tween(baddies3).to({x: -75}, 2000, Phaser.Easing.Linear.None, true, 0, 500, true);
 	
     platformCrashSound.play();
+    cameraShake();
 }
 
 // Kill baddies after collision with bullets
@@ -461,6 +472,17 @@ function asteroidExplode(bullet, asteroid) {
 function platformShot(bullet) {
     bullet.kill();
     platformShotSound.play();
+}
+
+function cameraShake() {
+    if(game.time.now > cameraShakeTime) {
+        game.camera.y -= 20;
+        setTimeout(function() {
+            game.camera.y += 20;
+        }, 100);
+    }
+    cameraShakeTime = game.time.now + 100;
+
 }
 
 function incrementScore(incrementAmount) {
