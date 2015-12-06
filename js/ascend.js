@@ -27,6 +27,7 @@ var alertSound,
     safeFlag = true,
     score = 0,
     scoreText,
+    splashScreen,
     warningText,
     shipStats,
     starfield,
@@ -53,6 +54,7 @@ function preload() {
     game.load.image('baddie1', 'assets/andriodShip.png');
     game.load.image('baddie2', 'assets/alien3.png'); 
     game.load.image('baddie3', 'assets/spaceShip.png'); 
+    game.load.image('splashScreen', 'assets/splashScreen.png');
     game.load.spritesheet('asteroid', 'assets/asteroid.png', 36, 36);
     game.load.spritesheet('beacon', 'assets/beacon.png', 36, 21);
     game.load.spritesheet('ship', 'assets/ship_sprites.png', 45, 52);
@@ -180,6 +182,7 @@ function create() {
     fireButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 
     warningText = game.add.text(16, 76, '', {font: '400 20px Audiowide', fill: '#F33', align: 'center'});
+    splashScreen = game.add.sprite(0, 0, 'splashScreen');
 
     // Add Sounds
     bulletSound = game.add.audio('bulletSound');
