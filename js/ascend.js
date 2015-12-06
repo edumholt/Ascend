@@ -4,6 +4,7 @@ var alertSound,
     alertTimer = 0,
     asteroidCrashSound,
     asteroids,
+    asteroidReleaseRate = .004,
     asteroidExplosion,
     bgSound,
     bellSound,
@@ -314,6 +315,8 @@ function update() {
 		
     }
 
+    asteroidReleaseRate *= 1.00005;
+
 }
 
 function render() {
@@ -326,7 +329,7 @@ function createText() {
 
 function createRandomAsteroid() {
 
-    if(Math.random() < .004) {
+    if(Math.random() < asteroidReleaseRate) {
         var asteroid = asteroids.create(Math.random() * 600 + 100, 0, 'asteroid', 1);
         asteroid.body.velocity.setTo(Math.random() * 60 - 30, Math.random() * 30 + 20);
         asteroid.animations.add('spin', [], 10, true);
