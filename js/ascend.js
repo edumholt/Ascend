@@ -65,6 +65,7 @@ function preload() {
     game.load.audio('alert', 'assets/intruderAlert.mp3');
     game.load.audio('asteroidCrash', 'assets/asteroidCrash.mp3');
     game.load.audio('asteroidExplosion', 'assets/asteroidExplosion.mp3');
+    game.load.audio('alienExplosion', 'assets/explosion_with_debris.mp3');
     game.load.audio('bell', 'assets/bell.mp3');
     game.load.audio('lose', 'assets/youLose.mp3');
 
@@ -188,6 +189,7 @@ function create() {
     alertSound = game.add.audio('alert');
     asteroidCrashSound = game.add.audio('asteroidCrash');
     asteroidSound = game.add.audio('asteroidExplosion');
+    alienExplosionSound = game.add.audio('alienExplosion');
     bellSound = game.add.audio('bell');
     loseSound = game.add.audio('lose');
     bgSound.play('', 0, 1, true);
@@ -434,33 +436,30 @@ function baddieRelease3() {
 function baddieOneKill(bullet, badGuy1) {
     badGuy1.kill();
     bullet.kill();
-	
 	explosion = explosions.getFirstExists(false);
 	explosion.reset(badGuy1.body.x, badGuy1.y);
 	explosion.play('kaboomExplosion', 30, false, true);
-	
+	alienExplosionSound.play();
     incrementScore(30);
 }
 
 function baddieTwoKill(bullet, badGuy2) {
     badGuy2.kill();
     bullet.kill();
-	
 	explosion = explosions.getFirstExists(false);
 	explosion.reset(badGuy2.body.x, badGuy2.y);
 	explosion.play('kaboomExplosion', 30, false, true);
-	
+    alienExplosionSound.play();
 	incrementScore(30);
 }
 
 function baddieThreeKill(bullet, badGuy3) {
     badGuy3.kill();
     bullet.kill();
-	
 	explosion = explosions.getFirstExists(false);
 	explosion.reset(badGuy3.body.x, badGuy3.y);
 	explosion.play('kaboomExplosion', 30, false, true);
-	
+    alienExplosionSound.play();
 	incrementScore(30);
 }
 
