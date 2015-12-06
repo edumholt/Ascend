@@ -28,6 +28,7 @@ var alertSound,
     score = 0,
     scoreText,
     splashScreen,
+    startGameTime = 0,
     warningText,
     shipStats,
     starfield,
@@ -182,7 +183,12 @@ function create() {
     fireButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 
     warningText = game.add.text(16, 76, '', {font: '400 20px Audiowide', fill: '#F33', align: 'center'});
+
     splashScreen = game.add.sprite(0, 0, 'splashScreen');
+
+    gameStartDelay();
+
+    game.paused = true;
 
     // Add Sounds
     bulletSound = game.add.audio('bulletSound');
@@ -197,7 +203,6 @@ function create() {
     bellSound = game.add.audio('bell');
     loseSound = game.add.audio('lose');
     bgSound.play('', 0, 1, true);
-
 }
 
 function update() {
@@ -328,6 +333,15 @@ function render() {
 function createText() {
     scoreText = game.add.text(16, 36, "SCORE: 0", {font: '400 24px Audiowide', fill: '#9F9'});
     livesText = game.add.text(620, 36, "LIVES: 3", {font: '400 24px Audiowide', fill: '#9F9'});
+}
+
+function gameStartDelay () {
+    game.input.onDown.add(unpause, this);
+    console.log("Entered gameStartDelay()")
+    function unpause () {
+        game.paused = false;
+        splashScreen.kill();
+    }
 }
 
 function createRandomAsteroid() {
