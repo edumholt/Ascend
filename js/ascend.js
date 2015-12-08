@@ -72,7 +72,6 @@ function preload() {
     game.load.audio('asteroidExplosion', 'assets/asteroidExplosion.mp3');
     game.load.audio('alienExplosion', 'assets/explosion_with_debris.mp3');
     game.load.audio('metroid', 'assets/metroid.mp3');
-    game.load.audio('bell', 'assets/bell.mp3');
     game.load.audio('lose', 'assets/youLose.mp3');
 
     // Load Google web font 'Audiowide'
@@ -287,8 +286,7 @@ function update() {
     }
     
    // Revive Platforms and enemies after they are gone
-	
-	
+
     if(!baddies1.countLiving() && !baddies2.countLiving() && !baddies3.countLiving()) {
         
         game.tweens.removeAll();
@@ -386,15 +384,12 @@ function createBaddies() {
 	for (var i = 0; i < numEnemies; i++) {
 
 		badGuy1 = baddies1.create(platformOne.x + i * 175, platformOne.y - 45, 'baddie1');
-	
     	badGuy1.body.velocity.y = 30;
 	
 		badGuy2 = baddies2.create(platformTwo.x + i * 200, platformTwo.y - 65, 'baddie2');
-		
     	badGuy2.body.velocity.y = 30;
 
 		badGuy3 = baddies3.create(platformThree.x + i * 175, platformThree.y - 45, 'baddie3');
-		
     	badGuy3.body.velocity.y = 30;
 	}
 }
@@ -413,7 +408,7 @@ function baddieRelease() {
 	
     baddies1.setAll('body.velocity.x', 10);
 
-    tween1 = game.add.tween(baddies1).to({x: 150, y: 75}, 2000, Phaser.Easing.Linear.None, true, 0, -1, true);
+    tween1 = game.add.tween(baddies1).to({x: 100, y: -75}, 2000, Phaser.Easing.Elastic.InOut, true, 0, -1, true);
 
     platformCrashSound.play(); 
     cameraShake();
@@ -424,7 +419,7 @@ function baddieRelease2() {
 	
     baddies2.setAll('body.velocity.x', 10);
 
-    tween2 = game.add.tween(baddies2).to({x: -200, y:40}, 2000, Phaser.Easing.Linear.None, true, 0, -1, true);
+    tween2 = game.add.tween(baddies2).to({x: -200, y: -60}, 2000, Phaser.Easing.Sinusoidal.InOut, true, 0, -1, true);
 
     platformCrashSound.play(); 
     cameraShake();
@@ -435,7 +430,7 @@ function baddieRelease3() {
 	
     baddies3.setAll('body.velocity.x', 10);
     
-    tween3 = game.add.tween(baddies3).to({x: -75}, 2000, Phaser.Easing.Linear.None, true, 0, -1, true);
+    tween3 = game.add.tween(baddies3).to({x: -125, y: 40}, 2000, Phaser.Easing.Back.InOut, true, 0, -1, true);
 	
     platformCrashSound.play();
     cameraShake();
