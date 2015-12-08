@@ -1,4 +1,4 @@
-var game = new Phaser.Game(800, 620, Phaser.AUTO, '', {preload: preload, create: create, update: update, render: render});
+var game = new Phaser.Game(800, 620, Phaser.AUTO, '', {preload: preload, create: create, update: update});
 
 var alertSound,
     alertTimer = 0,
@@ -22,6 +22,7 @@ var alertSound,
     lives = 3,
     livesText,
     livesTimer = 0,
+    metroidSound,
 	numEnemies = 2,
     platforms,
     safeFlag = true,
@@ -70,6 +71,7 @@ function preload() {
     game.load.audio('asteroidCrash', 'assets/asteroidCrash.mp3');
     game.load.audio('asteroidExplosion', 'assets/asteroidExplosion.mp3');
     game.load.audio('alienExplosion', 'assets/explosion_with_debris.mp3');
+    game.load.audio('metroid', 'assets/metroid.mp3');
     game.load.audio('bell', 'assets/bell.mp3');
     game.load.audio('lose', 'assets/youLose.mp3');
 
@@ -205,6 +207,7 @@ function create() {
     asteroidSound = game.add.audio('asteroidExplosion');
     alienExplosionSound = game.add.audio('alienExplosion');
     bellSound = game.add.audio('bell');
+    metroidSound = game.add.audio('metroid');
     loseSound = game.add.audio('lose');
     bgSound.play('', 0, 1, true);
 }
@@ -224,12 +227,12 @@ function update() {
     game.physics.arcade.collide(ship, baddies1, baddieOneCrash, null, this);
     game.physics.arcade.collide(ship, baddies2, baddieTwoCrash, null, this);
     game.physics.arcade.collide(ship, baddies3, baddieThreeCrash, null, this);
+	game.physics.arcade.overlap(ship, beacons, addLives, null, this);
 	
 	// Kills baddies at bottom of screen
     game.physics.arcade.collide(dangerZone, baddies1, baddieOneBottom, null, this);
     game.physics.arcade.collide(dangerZone, baddies2, baddieTwoBottom, null, this);
     game.physics.arcade.collide(dangerZone, baddies3, baddieThreeBottom, null, this);
-	game.physics.arcade.overlap(ship, beacons, addLives, null, this);
 	
 	// Collisions to kill enemies
 	// still working on fixing this so its less code
@@ -292,9 +295,8 @@ function update() {
 		
 		// Bring back platformOne with its baddies
 		
-		baddies1.x = 0;
-		baddies2.x = 0;
-		baddies3.x = 0;
+		baddies1.x = baddies2.x = baddies3.x = 0;
+        baddies1.y = baddies2.y = baddies3.y = 0;
 		
 		platformCreate();
 		createBaddies();
@@ -317,9 +319,6 @@ function update() {
 
 }
 
-function render() {
-}
-
 function createText() {
     scoreText = game.add.text(16, 36, "SCORE: 0", {font: '400 24px Audiowide', fill: '#9F9'});
     livesText = game.add.text(620, 36, "LIVES: 3", {font: '400 24px Audiowide', fill: '#9F9'});
@@ -327,7 +326,6 @@ function createText() {
 
 function gameStartDelay () {
     game.input.onDown.add(unpause, this);
-    console.log("Entered gameStartDelay()")
     function unpause () {
         game.paused = false;
         splashScreen.kill();
@@ -415,7 +413,7 @@ function baddieRelease() {
 	
     baddies1.setAll('body.velocity.x', 10);
 
-    tween1 = game.add.tween(baddies1).to({x: 200}, 2000, Phaser.Easing.Linear.None, true, 0, 500, true);
+    tween1 = game.add.tween(baddies1).to({x: 150, y: 75}, 2000, Phaser.Easing.Linear.None, true, 0, -1, true);
 
     platformCrashSound.play(); 
     cameraShake();
@@ -426,7 +424,7 @@ function baddieRelease2() {
 	
     baddies2.setAll('body.velocity.x', 10);
 
-    tween2 = game.add.tween(baddies2).to({x: -250}, 2000, Phaser.Easing.Linear.None, true, 0, 500, true);
+    tween2 = game.add.tween(baddies2).to({x: -200, y:40}, 2000, Phaser.Easing.Linear.None, true, 0, -1, true);
 
     platformCrashSound.play(); 
     cameraShake();
@@ -437,7 +435,7 @@ function baddieRelease3() {
 	
     baddies3.setAll('body.velocity.x', 10);
     
-    tween3 = game.add.tween(baddies3).to({x: -75}, 2000, Phaser.Easing.Linear.None, true, 0, 500, true);
+    tween3 = game.add.tween(baddies3).to({x: -75}, 2000, Phaser.Easing.Linear.None, true, 0, -1, true);
 	
     platformCrashSound.play();
     cameraShake();
@@ -476,32 +474,29 @@ function baddieThreeKill(bullet, badGuy3) {
 
 function baddieOneCrash(ship, badGuy1) {
 	badGuy1.kill();
-	
 	checkLives();
-	
 	explosion = explosions.getFirstExists(false);
 	explosion.reset(badGuy1.body.x, badGuy1.y);
 	explosion.play('kaboomExplosion', 30, false, true);
+    cameraShake();
 }
 
 function baddieTwoCrash(ship, badGuy2) {
 	badGuy2.kill();
-	
 	checkLives();
-	
 	explosion = explosions.getFirstExists(false);
 	explosion.reset(badGuy2.body.x, badGuy2.y);
 	explosion.play('kaboomExplosion', 30, false, true);
+    cameraShake();
 }
 
 function baddieThreeCrash(ship, badGuy3) {
 	badGuy3.kill();
-	
 	checkLives();
-	
 	explosion = explosions.getFirstExists(false);
 	explosion.reset(badGuy3.body.x, badGuy3.y);
 	explosion.play('kaboomExplosion', 30, false, true);
+    cameraShake();
 }
 
 function baddieOneBottom(dangerZone, badGuy1) {
@@ -550,7 +545,7 @@ function incrementScore(incrementAmount) {
 
 function addLives(ship, beacon) {
     beacon.kill();
-    bellSound.play();
+    metroidSound.play();
     lives++;
     livesText.text = "LIVES: " + lives;
 }
@@ -564,14 +559,12 @@ function checkLives(){
             livesText.text = "LIVES: " + lives;
             livesTimer = game.time.now + 500;
         } else {
-            console.log("calling gameOver() from else statement");
             gameOver();
         }
     }
 }
 
 function gameOver() {
-    console.log("Entering gameOver()...");
     bgSound.stop();
     enemyBoom.play();
     livesText.text = "GAME OVER"
