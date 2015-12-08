@@ -506,26 +506,14 @@ function baddieThreeCrash(ship, badGuy3) {
 
 function baddieOneBottom(dangerZone, badGuy1) {
 	badGuy1.kill();
-	
-	explosion = explosions.getFirstExists(false);
-	explosion.reset(badGuy1.body.x, badGuy1.y);
-	explosion.play('kaboomExplosion', 30, false, true);
 }
 
 function baddieTwoBottom(dangerZone, badGuy2) {
 	badGuy2.kill();
-	
-	explosion = explosions.getFirstExists(false);
-	explosion.reset(badGuy2.body.x, badGuy2.y);
-	explosion.play('kaboomExplosion', 30, false, true);
 }
 
 function baddieThreeBottom(dangerZone, badGuy3) {
 	badGuy3.kill();
-	
-	explosion = explosions.getFirstExists(false);
-	explosion.reset(badGuy3.body.x, badGuy3.y);
-	explosion.play('kaboomExplosion', 30, false, true);
 }
 
 function asteroidExplode(bullet, asteroid) {
