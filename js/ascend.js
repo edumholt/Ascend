@@ -49,30 +49,7 @@ WebFontConfig = {
 
 function preload() {
 
-    game.load.image('starfield', 'assets/starfield.png');
-    game.load.image('dangerZone', 'assets/DoNotEnter.png');
-    game.load.image('bullet', 'assets/bullet.png');
-    game.load.image('platform', 'assets/platform.png');
-    game.load.image('baddie1', 'assets/andriodShip.png');
-    game.load.image('baddie2', 'assets/alien3.png'); 
-    game.load.image('baddie3', 'assets/spaceShip.png'); 
-    game.load.image('splashScreen', 'assets/splashScreen.png');
-    game.load.spritesheet('asteroid', 'assets/asteroid.png', 36, 36);
-    game.load.spritesheet('beacon', 'assets/beacon.png', 36, 21);
-    game.load.spritesheet('ship', 'assets/ship_sprites.png', 45, 52);
-    game.load.spritesheet('shipExplosion', 'assets/explosion.png', 100, 100);
-    game.load.spritesheet('asteroidExplosion', 'assets/asteroidExplosion.png', 64, 64);
-    game.load.audio('bg', 'assets/bg.mp3');
-    game.load.audio('bulletSound', 'assets/bulletSound.mp3');
-    game.load.audio('platformHit', 'assets/platformHit.mp3');
-    game.load.audio('platformShot', 'assets/platformShot.mp3');
-    game.load.audio('expl', 'assets/expl.mp3');
-    game.load.audio('alert', 'assets/intruderAlert.mp3');
-    game.load.audio('asteroidCrash', 'assets/asteroidCrash.mp3');
-    game.load.audio('asteroidExplosion', 'assets/asteroidExplosion.mp3');
-    game.load.audio('alienExplosion', 'assets/explosion_with_debris.mp3');
-    game.load.audio('metroid', 'assets/metroid.mp3');
-    game.load.audio('lose', 'assets/youLose.mp3');
+    ascendLoad();
 
     // Load Google web font 'Audiowide'
     game.load.script('webfont', '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');
@@ -127,7 +104,7 @@ function create() {
     beacons.setAll('outOfBoundsKill', true);
     beacons.setAll('checkWorldBounds', true);
     
-    dangerZone = game.add.sprite(0, game.height - 30, 'dangerZone');
+    dangerZone = game.add.sprite(0, game.height - 30, 'DoNotEnter');
 
     // Game controls
     cursors = game.input.keyboard.createCursorKeys();
