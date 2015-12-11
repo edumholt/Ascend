@@ -76,33 +76,17 @@ function create() {
 
     // Create bullets group
     bullets = game.add.group();
-    bullets.enableBody = true;
-    bullets.physicsBodyType = Phaser.Physics.ARCADE;
+    setupGroupDefaults(bullets);
     bullets.createMultiple(300, 'bullet');
-    bullets.setAll('anchor.x', 0.5);
-    bullets.setAll('anchor.y', 1);
-    bullets.setAll('outOfBoundsKill', true);
-    bullets.setAll('checkWorldBounds', true);
 
-    // Create asteroids group
     asteroids = game.add.group();
-    asteroids.enableBody = true;
-    asteroids.physicsBodyType = Phaser.Physics.ARCADE;
+    setupGroupDefaults(asteroids);
 
-    asteroids.setAll('anchor.x', 0.5);
-    asteroids.setAll('anchor.y', 0.5);
-    asteroids.setAll('outOfBoundsKill', true);
-    asteroids.setAll('checkWorldBounds', true);
-    
-    // Create beacon group
     beacons = game.add.group();
-    beacons.enableBody = true;
-    beacons.physicsBodyType = Phaser.Physics.ARCADE;
+    setupGroupDefaults(beacons);
 
-    beacons.setAll('anchor.x', 0.5);
-    beacons.setAll('anchor.y', 0.5);
-    beacons.setAll('outOfBoundsKill', true);
-    beacons.setAll('checkWorldBounds', true);
+    platforms = game.add.group();
+    setupGroupDefaults(platforms);
     
     dangerZone = game.add.sprite(0, game.height - 30, 'DoNotEnter');
 
@@ -205,6 +189,18 @@ function gameStartDelay () {
     }
 }
 
+function setupGroupDefaults (groupName) {
+
+    groupName.enableBody = true;
+    groupName.physicsBodyType = Phaser.Physics.ARCADE;
+
+    groupName.setAll('anchor.x', 0.5);
+    groupName.setAll('anchor.y', 0.5);
+    groupName.setAll('outOfBoundsKill', true);
+    groupName.setAll('checkWorldBounds', true);
+
+}
+
 function createRandomAsteroid() {
 
     if(Math.random() < asteroidReleaseRate) {
@@ -231,7 +227,7 @@ function fireBullet() {
         bullet = bullets.getFirstExists(false);
         if(bullet) {
             //And fire it
-            bullet.reset(ship.x, ship.y - 12);
+            bullet.reset(ship.x - 16, ship.y - 30);
             bullet.body.velocity.y = -400;
             bulletSound.play();
             bulletTime = game.time.now + 200;
