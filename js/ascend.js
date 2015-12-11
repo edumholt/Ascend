@@ -126,62 +126,8 @@ function create() {
     beacons.setAll('anchor.y', 0.5);
     beacons.setAll('outOfBoundsKill', true);
     beacons.setAll('checkWorldBounds', true);
-
-
-    // Create platforms group
-    platforms = game.add.group();
-    platforms.enableBody = true;
-    platforms.physicsBodyType = Phaser.Physics.ARCADE;
-    platforms.collideWorldBounds =true;
-    
-    platforms.setAll('anchor.x', 0.5);
-    platforms.setAll('anchor.y', 0.5);
-    platforms.setAll('checkWorldBounds', true);
-    platforms.setAll('outOfBoundsKill', true);
-	
-	platformCreate(); 
-
-    // Create baddies group
-    baddies1 = game.add.group();
-    baddies1.enableBody = true;
-    baddies1.physicsBodyType = Phaser.Physics.ARCADE;
-    
-    baddies1.setAll('anchor.x', 0.5);
-    baddies1.setAll('anchor.y', 0.5);
-    baddies1.setAll('checkWorldBounds', true);
-    baddies1.setAll('outOfBoundsKill', true);
-	
-	baddies2 = game.add.group();
-    baddies2.enableBody = true;
-    baddies2.physicsBodyType = Phaser.Physics.ARCADE;
-    
-    baddies2.setAll('anchor.x', 0.5);
-    baddies2.setAll('anchor.y', 0.5);
-    baddies2.setAll('checkWorldBounds', true);
-    baddies2.setAll('outOfBoundsKill', true);
-	
-	baddies3 = game.add.group();
-    baddies3.enableBody = true;
-    baddies3.physicsBodyType = Phaser.Physics.ARCADE;
-    
-    baddies3.setAll('anchor.x', 0.5);
-    baddies3.setAll('anchor.y', 0.5);
-    baddies3.setAll('checkWorldBounds', true);
-    baddies3.setAll('outOfBoundsKill', true);
-	
-	createBaddies();
     
     dangerZone = game.add.sprite(0, game.height - 30, 'dangerZone');
-	game.physics.arcade.enable(dangerZone);
-	dangerZone.body.immovable = true;
-	
-	
-	
-	// Create a pool of explosions
-    explosions = game.add.group();
-    explosions.createMultiple(300, 'shipExplosion');
-	
-	explosions.forEach(setupBaddie, this);
 
     // Game controls
     cursors = game.input.keyboard.createCursorKeys();
@@ -214,30 +160,10 @@ function create() {
 function update() {
     
     // Collisions
-    game.physics.arcade.collide(ship, platformOne, baddieRelease, null, this);
-    game.physics.arcade.collide(ship, platformTwo, baddieRelease2, null, this);
-    game.physics.arcade.collide(ship, platformThree, baddieRelease3, null, this);
-    game.physics.arcade.collide(baddies1, platforms);
-    game.physics.arcade.collide(baddies2, platforms);
-    game.physics.arcade.collide(baddies3, platforms);
-    game.physics.arcade.collide(bullets, platforms, platformShot, null, this);
 	game.physics.arcade.collide(bullets, asteroids, asteroidExplode, null, this);
     game.physics.arcade.collide(ship, asteroids, checkLives, null, this);
-    game.physics.arcade.collide(ship, baddies1, baddieOneCrash, null, this);
-    game.physics.arcade.collide(ship, baddies2, baddieTwoCrash, null, this);
-    game.physics.arcade.collide(ship, baddies3, baddieThreeCrash, null, this);
 	game.physics.arcade.overlap(ship, beacons, addLives, null, this);
-	
-	// Kills baddies at bottom of screen
-    game.physics.arcade.collide(dangerZone, baddies1, baddieOneBottom, null, this);
-    game.physics.arcade.collide(dangerZone, baddies2, baddieTwoBottom, null, this);
-    game.physics.arcade.collide(dangerZone, baddies3, baddieThreeBottom, null, this);
-	
-	// Collisions to kill enemies
-	// still working on fixing this so its less code
-	game.physics.arcade.collide(bullets, baddies1, baddieOneKill, null, this);
-    game.physics.arcade.collide(bullets, baddies2, baddieTwoKill, null, this);
-    game.physics.arcade.collide(bullets, baddies3, baddieThreeKill, null, this);
+
     starfield.tilePosition.y += 0.4;
 
     createRandomAsteroid();
@@ -283,34 +209,6 @@ function update() {
     if(ship.y >= game.world.height - 50 && safeFlag) {
         gameOver();
         safeFlag = false;
-    }
-    
-   // Revive Platforms and enemies after they are gone
-
-    if(!baddies1.countLiving() && !baddies2.countLiving() && !baddies3.countLiving()) {
-        
-        game.tweens.removeAll();
-		
-		// Bring back platformOne with its baddies
-		
-		baddies1.x = baddies2.x = baddies3.x = 0;
-        baddies1.y = baddies2.y = baddies3.y = 0;
-		
-		platformCreate();
-		createBaddies();
-		
-    }
-    
-	if(platformOne.y >= game.world.height - 50 ) {
-    	platformOne.kill();
-   }
-	
-	if(platformTwo.y >= game.world.height - 50 ) {
-        platformTwo.kill();
-    }
-	
-	if(platformThree.y >= game.world.height - 50 ) {
-        platformThree.kill();
     }
 
     asteroidReleaseRate *= 1.00005;
@@ -365,147 +263,6 @@ function fireBullet() {
 
 }
 
-function platformCreate() {
-
-	platformOne = platforms.create(50, 1, 'platform');
-    platformOne.body.immovable = true;
-    platformOne.body.velocity.y = 30;
-
-    platformTwo = platforms.create(500, -45, 'platform');
-    platformTwo.body.immovable = true;
-    platformTwo.body.velocity.y = 30;
-
-	platformThree = platforms.create(275, -250, 'platform');
-    platformThree.body.immovable = true;
-    platformThree.body.velocity.y = 30;
-}
-
-function createBaddies() {
-	for (var i = 0; i < numEnemies; i++) {
-
-		badGuy1 = baddies1.create(platformOne.x + i * 175, platformOne.y - 45, 'baddie1');
-    	badGuy1.body.velocity.y = 30;
-	
-		badGuy2 = baddies2.create(platformTwo.x + i * 200, platformTwo.y - 65, 'baddie2');
-    	badGuy2.body.velocity.y = 30;
-
-		badGuy3 = baddies3.create(platformThree.x + i * 175, platformThree.y - 45, 'baddie3');
-    	badGuy3.body.velocity.y = 30;
-	}
-}
-
-function setupBaddie(baddieExplosion) {
-
-    baddieExplosion.anchor.setTo(0.5, 0.5);
-    baddieExplosion.animations.add('kaboomExplosion');
-
-}
-
-// Have baddies become active once platform is collided with
-// And play sound for platform and ship collision
-function baddieRelease() {
-	platformOne.kill();
-	
-    baddies1.setAll('body.velocity.x', 10);
-
-    tween1 = game.add.tween(baddies1).to({x: 100, y: -75}, 2000, Phaser.Easing.Elastic.InOut, true, 0, -1, true);
-
-    platformCrashSound.play(); 
-    cameraShake();
-}
-
-function baddieRelease2() {
-	platformTwo.kill();
-	
-    baddies2.setAll('body.velocity.x', 10);
-
-    tween2 = game.add.tween(baddies2).to({x: -200, y: -60}, 2000, Phaser.Easing.Sinusoidal.InOut, true, 0, -1, true);
-
-    platformCrashSound.play(); 
-    cameraShake();
-}
-
-function baddieRelease3() {
-	platformThree.kill();
-	
-    baddies3.setAll('body.velocity.x', 10);
-    
-    tween3 = game.add.tween(baddies3).to({x: -125, y: 40}, 2000, Phaser.Easing.Back.InOut, true, 0, -1, true);
-	
-    platformCrashSound.play();
-    cameraShake();
-}
-
-// Kill baddies after collision with bullets
-function baddieOneKill(bullet, badGuy1) {
-    badGuy1.kill();
-    bullet.kill();
-	explosion = explosions.getFirstExists(false);
-	explosion.reset(badGuy1.body.x, badGuy1.y);
-	explosion.play('kaboomExplosion', 30, false, true);
-	alienExplosionSound.play();
-    incrementScore(30);
-}
-
-function baddieTwoKill(bullet, badGuy2) {
-    badGuy2.kill();
-    bullet.kill();
-	explosion = explosions.getFirstExists(false);
-	explosion.reset(badGuy2.body.x, badGuy2.y);
-	explosion.play('kaboomExplosion', 30, false, true);
-    alienExplosionSound.play();
-	incrementScore(30);
-}
-
-function baddieThreeKill(bullet, badGuy3) {
-    badGuy3.kill();
-    bullet.kill();
-	explosion = explosions.getFirstExists(false);
-	explosion.reset(badGuy3.body.x, badGuy3.y);
-	explosion.play('kaboomExplosion', 30, false, true);
-    alienExplosionSound.play();
-	incrementScore(30);
-}
-
-function baddieOneCrash(ship, badGuy1) {
-	badGuy1.kill();
-	checkLives();
-	explosion = explosions.getFirstExists(false);
-	explosion.reset(badGuy1.body.x, badGuy1.y);
-	explosion.play('kaboomExplosion', 30, false, true);
-    cameraShake();
-}
-
-function baddieTwoCrash(ship, badGuy2) {
-	badGuy2.kill();
-	checkLives();
-	explosion = explosions.getFirstExists(false);
-	explosion.reset(badGuy2.body.x, badGuy2.y);
-	explosion.play('kaboomExplosion', 30, false, true);
-    cameraShake();
-}
-
-function baddieThreeCrash(ship, badGuy3) {
-	badGuy3.kill();
-	checkLives();
-	explosion = explosions.getFirstExists(false);
-	explosion.reset(badGuy3.body.x, badGuy3.y);
-	explosion.play('kaboomExplosion', 30, false, true);
-    cameraShake();
-}
-
-function baddieOneBottom(dangerZone, badGuy1) {
-	badGuy1.kill();
-}
-
-function baddieTwoBottom(dangerZone, badGuy2) {
-	badGuy2.kill();
-}
-
-function baddieThreeBottom(dangerZone, badGuy3) {
-	badGuy3.kill();
-}
-
 function asteroidExplode(bullet, asteroid) {
     bullet.kill();
     asteroid.kill();
@@ -515,11 +272,6 @@ function asteroidExplode(bullet, asteroid) {
     asteroidExplosion.animations.play('explode');
     asteroidSound.play();
     incrementScore(10);
-}
-
-function platformShot(bullet) {
-    bullet.kill();
-    platformShotSound.play();
 }
 
 function cameraShake() {
