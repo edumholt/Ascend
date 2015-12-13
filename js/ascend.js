@@ -96,6 +96,25 @@ function create() {
     setupGroupDefaults(platforms);
     platforms.createMultiple(300, 'platform');
     
+    // Create three aliens groups
+    aliensGroupOne = game.add.group();
+    setupGroupDefaults(aliensGroupOne);
+    aliensGroupOne.createMultiple(50, 'alien1');
+    aliensGroupOne.setAll('anchor.x', 0.5);
+    aliensGroupOne.setAll('anchor.y', 0.5);
+
+    aliensGroupTwo = game.add.group();
+    setupGroupDefaults(aliensGroupTwo);
+    aliensGroupTwo.createMultiple(50, 'alien2');
+    aliensGroupTwo.setAll('anchor.x', 0.5);
+    aliensGroupTwo.setAll('anchor.y', 0.5);
+
+    aliensGroupThree = game.add.group();
+    setupGroupDefaults(aliensGroupThree);
+    aliensGroupThree.createMultiple(50, 'alien3');
+    aliensGroupThree.setAll('anchor.x', 0.5);
+    aliensGroupThree.setAll('anchor.y', 0.5);
+
     dangerZone = game.add.sprite(0, game.height - 30, 'DoNotEnter');
 
     // Game controls
@@ -135,7 +154,7 @@ function update() {
 
     starfield.tilePosition.y += 0.4;
 
-    createRandomPlatformWithBaddies();
+    createRandomPlatformWithAliens();
     createRandomAsteroid();
     createRandomBeacon();
 
@@ -202,15 +221,12 @@ function setupGroupDefaults (groupName) {
 
     groupName.enableBody = true;
     groupName.physicsBodyType = Phaser.Physics.ARCADE;
-
-    groupName.setAll('anchor.x', 0.5);
-    groupName.setAll('anchor.y', 0.5);
     groupName.setAll('outOfBoundsKill', true);
     groupName.setAll('checkWorldBounds', true);
 
 }
 
-function createRandomPlatformWithBaddies() {
+function createRandomPlatformWithAliens() {
 
     if(game.time.now > platformReleaseTime) {
         platform = platforms.getFirstExists(false);
@@ -218,8 +234,70 @@ function createRandomPlatformWithBaddies() {
             platform.reset(Math.random() * 550 + 120, 0);
             platform.anchor.setTo(0.5, 0.5);
             platform.body.velocity.setTo(0, 30);
+            createAliensOnPlatform(platform);
             platformReleaseTime = game.time.now + 10000;
         }
+    }
+
+}
+
+function createAliensOnPlatform(platform) {
+
+    var whichAlien = Math.floor(Math.random() * 3 + 1);
+
+    console.log("whichAlien = " + whichAlien);
+
+    // Create left alien
+    switch(whichAlien) {
+        case 1:
+            var alien1 = aliensGroupOne.getFirstExists(false);
+            if(alien1) {
+                alien1.reset(platform.x - 100, platform.y - 40);
+                alien1.body.velocity.setTo(0, 30);
+            }
+            break;
+        case 2:
+            var alien2 = aliensGroupTwo.getFirstExists(false);
+            if(alien2) {
+                alien2.reset(platform.x - 100, platform.y - 40);
+                alien2.body.velocity.setTo(0, 30);
+            }
+            break;
+        case 3:
+            var alien3 = aliensGroupThree.getFirstExists(false);
+            if(alien3) {
+                alien3.reset(platform.x - 100, platform.y - 40);
+                alien3.body.velocity.setTo(0, 30);
+            }
+            break;
+    }
+
+    whichAlien = Math.floor(Math.random() * 3 + 1);
+    console.log("whichAlien = " + whichAlien);
+
+    // Create right alien
+    switch(whichAlien) {
+        case 1:
+            var alien1 = aliensGroupOne.getFirstExists(false);
+            if(alien1) {
+                alien1.reset(platform.x + 100, platform.y - 40);
+                alien1.body.velocity.setTo(0, 30);
+            }
+            break;
+        case 2:
+            var alien2 = aliensGroupTwo.getFirstExists(false);
+            if(alien2) {
+                alien2.reset(platform.x + 100, platform.y - 40);
+                alien2.body.velocity.setTo(0, 30);
+            }
+            break;
+        case 3:
+            var alien3 = aliensGroupThree.getFirstExists(false);
+            if(alien3) {
+                alien3.reset(platform.x + 100, platform.y - 40);
+                alien3.body.velocity.setTo(0, 30);
+            }
+            break;
     }
 
 }

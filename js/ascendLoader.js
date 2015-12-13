@@ -5,9 +5,9 @@ function ascendLoad() {
     game.load.image('DoNotEnter');
     game.load.image('bullet');
     game.load.image('platform');
-    game.load.image('andriodShip');
+    game.load.image('alien1');
+    game.load.image('alien2');
     game.load.image('alien3');
-    game.load.image('spaceShip');
     game.load.image('splashScreen');
     game.load.spritesheet('asteroid', 'asteroid.png', 36, 36);
     game.load.spritesheet('beacon', 'beacon.png', 36, 21);
