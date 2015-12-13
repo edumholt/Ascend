@@ -2,6 +2,9 @@ var game = new Phaser.Game(800, 620, Phaser.AUTO, '', {preload: preload, create:
 
 var alertSound,
     alertTimer = 0,
+    aliensGroupOne,
+    aliensGroupTwo,
+    aliensGroupThree,
     asteroidCrashSound,
     asteroids,
     asteroidReleaseRate = .004,
@@ -23,7 +26,8 @@ var alertSound,
     livesText,
     livesTimer = 0,
     metroidSound,
-	numEnemies = 2,
+    platform,
+    platformReleaseTime = 0,
     platforms,
     safeFlag = true,
     score = 0,
@@ -79,14 +83,18 @@ function create() {
     setupGroupDefaults(bullets);
     bullets.createMultiple(300, 'bullet');
 
+    // Create asteroids group
     asteroids = game.add.group();
     setupGroupDefaults(asteroids);
 
+    // Create beacons group
     beacons = game.add.group();
     setupGroupDefaults(beacons);
 
+    // Create platforms group
     platforms = game.add.group();
     setupGroupDefaults(platforms);
+    platforms.createMultiple(300, 'platform');
     
     dangerZone = game.add.sprite(0, game.height - 30, 'DoNotEnter');
 
@@ -127,6 +135,7 @@ function update() {
 
     starfield.tilePosition.y += 0.4;
 
+    createRandomPlatformWithBaddies();
     createRandomAsteroid();
     createRandomBeacon();
 
@@ -198,6 +207,20 @@ function setupGroupDefaults (groupName) {
     groupName.setAll('anchor.y', 0.5);
     groupName.setAll('outOfBoundsKill', true);
     groupName.setAll('checkWorldBounds', true);
+
+}
+
+function createRandomPlatformWithBaddies() {
+
+    if(game.time.now > platformReleaseTime) {
+        platform = platforms.getFirstExists(false);
+        if(platform) {
+            platform.reset(Math.random() * 550 + 120, 0);
+            platform.anchor.setTo(0.5, 0.5);
+            platform.body.velocity.setTo(0, 30);
+            platformReleaseTime = game.time.now + 10000;
+        }
+    }
 
 }
 
