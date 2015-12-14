@@ -283,8 +283,8 @@ function bumpPlatform(ship, platform) {
         var rockTween = game.add.tween(platform);
         var disappearTween = game.add.tween(platform);
 
-        shiftTween.to({angle: -10}, 20, null, true);
-        rockTween.to({angle: 10}, 120, null, false, 0, 6, true);
+        shiftTween.to({angle: -10}, 10, null, true);
+        rockTween.to({angle: 10}, 60, null, false, 0, 6, true);
         disappearTween.to({alpha: .1}, 50);
         shiftTween.chain(rockTween);
         rockTween.chain(disappearTween);
