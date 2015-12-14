@@ -40,3 +40,12 @@ function createGameSprites() {
     dangerZone = game.add.sprite(0, game.height - 30, 'DoNotEnter');
 
 }
+
+function setupGroupDefaults (groupName) {
+
+    groupName.enableBody = true;
+    groupName.physicsBodyType = Phaser.Physics.ARCADE;
+    groupName.setAll('outOfBoundsKill', true);
+    groupName.setAll('checkWorldBounds', true);
+
+}

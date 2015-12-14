@@ -14,6 +14,7 @@ var alertSound,
     bulletSound,
     bullets,
     bulletTime = 0,
+    bumpTimer = 0,
     beacons,
     cameraShakeTime = 0,
     cameraView,
@@ -26,7 +27,7 @@ var alertSound,
     livesText,
     livesTimer = 0,
     metroidSound,
-    platform,
+    // platform,
     platformReleaseTime = 0,
     platforms,
     safeFlag = true,
@@ -78,7 +79,7 @@ function create() {
 
     ship.animations.add('rotateTurrets', [], 30, true);
 
-    createGameSprites();
+    createGameSprites(); // in ascendGameSprites.js
 
     // Game controls
     cursors = game.input.keyboard.createCursorKeys();
@@ -114,8 +115,9 @@ function update() {
 	game.physics.arcade.collide(bullets, asteroids, asteroidExplode, null, this);
     game.physics.arcade.collide(ship, asteroids, checkLives, null, this);
 	game.physics.arcade.overlap(ship, beacons, addLives, null, this);
+    game.physics.arcade.collide(ship, platforms, bumpPlatform, null, this);
 
-    starfield.tilePosition.y += 0.4;
+    starfield.tilePosition.y += 0.34;
 
     createRandomPlatformWithAliens();
     createRandomAsteroid();
@@ -180,23 +182,17 @@ function gameStartDelay () {
     }
 }
 
-function setupGroupDefaults (groupName) {
-
-    groupName.enableBody = true;
-    groupName.physicsBodyType = Phaser.Physics.ARCADE;
-    groupName.setAll('outOfBoundsKill', true);
-    groupName.setAll('checkWorldBounds', true);
-
-}
-
 function createRandomPlatformWithAliens() {
 
     if(game.time.now > platformReleaseTime) {
-        platform = platforms.getFirstExists(false);
+        var platform = platforms.getFirstExists(false);
         if(platform) {
             platform.reset(Math.random() * 550 + 120, 0);
             platform.anchor.setTo(0.5, 0.5);
             platform.body.velocity.setTo(0, 30);
+            platform.body.immovable = true;
+            platform.alpha = 1.0;
+            platform.angle = 0;
             createAliensOnPlatform(platform);
             platformReleaseTime = game.time.now + 10000;
         }
@@ -206,62 +202,43 @@ function createRandomPlatformWithAliens() {
 
 function createAliensOnPlatform(platform) {
 
-    var whichAlien = Math.floor(Math.random() * 3 + 1);
+    var leftAlien, rightAlien;
 
-    console.log("whichAlien = " + whichAlien);
+    var whichAlien = Math.floor(Math.random() * 3 + 1);
 
     // Create left alien
     switch(whichAlien) {
         case 1:
-            var alien1 = aliensGroupOne.getFirstExists(false);
-            if(alien1) {
-                alien1.reset(platform.x - 100, platform.y - 40);
-                alien1.body.velocity.setTo(0, 30);
-            }
+            leftAlien = aliensGroupOne.getFirstExists(false);
             break;
         case 2:
-            var alien2 = aliensGroupTwo.getFirstExists(false);
-            if(alien2) {
-                alien2.reset(platform.x - 100, platform.y - 40);
-                alien2.body.velocity.setTo(0, 30);
-            }
+            leftAlien = aliensGroupTwo.getFirstExists(false);
             break;
         case 3:
-            var alien3 = aliensGroupThree.getFirstExists(false);
-            if(alien3) {
-                alien3.reset(platform.x - 100, platform.y - 40);
-                alien3.body.velocity.setTo(0, 30);
-            }
+            leftAlien = aliensGroupThree.getFirstExists(false);
             break;
     }
 
+    leftAlien.reset(platform.x - 100, platform.y - 40);
+    leftAlien.body.velocity.setTo(0, 30);
+
     whichAlien = Math.floor(Math.random() * 3 + 1);
-    console.log("whichAlien = " + whichAlien);
 
     // Create right alien
     switch(whichAlien) {
         case 1:
-            var alien1 = aliensGroupOne.getFirstExists(false);
-            if(alien1) {
-                alien1.reset(platform.x + 100, platform.y - 40);
-                alien1.body.velocity.setTo(0, 30);
-            }
+            rightAlien = aliensGroupOne.getFirstExists(false);
             break;
         case 2:
-            var alien2 = aliensGroupTwo.getFirstExists(false);
-            if(alien2) {
-                alien2.reset(platform.x + 100, platform.y - 40);
-                alien2.body.velocity.setTo(0, 30);
-            }
+            rightAlien = aliensGroupTwo.getFirstExists(false);
             break;
         case 3:
-            var alien3 = aliensGroupThree.getFirstExists(false);
-            if(alien3) {
-                alien3.reset(platform.x + 100, platform.y - 40);
-                alien3.body.velocity.setTo(0, 30);
-            }
+            rightAlien = aliensGroupThree.getFirstExists(false);
             break;
     }
+
+    rightAlien.reset(platform.x + 100, platform.y - 40);
+    rightAlien.body.velocity.setTo(0, 30);
 
 }
 
@@ -300,6 +277,27 @@ function fireBullet() {
 
 }
 
+function bumpPlatform(ship, platform) {
+    if(game.time.now > bumpTimer) {
+        var shiftTween = game.add.tween(platform);
+        var rockTween = game.add.tween(platform);
+        var disappearTween = game.add.tween(platform);
+
+        shiftTween.to({angle: -10}, 20, null, true);
+        rockTween.to({angle: 10}, 120, null, false, 0, 6, true);
+        disappearTween.to({alpha: .1}, 50);
+        shiftTween.chain(rockTween);
+        rockTween.chain(disappearTween);
+        disappearTween.onComplete.add(function() {
+            platform.kill();
+        }, this);
+
+        cameraShake();
+        ship.body.velocity.y = 180;
+        bumpTimer = game.time.now + 2000;
+    }
+}
+
 function asteroidExplode(bullet, asteroid) {
     bullet.kill();
     asteroid.kill();
@@ -312,13 +310,8 @@ function asteroidExplode(bullet, asteroid) {
 }
 
 function cameraShake() {
-    if(game.time.now > cameraShakeTime) {
-        game.camera.y -= 20;
-        setTimeout(function() {
-            game.camera.y += 20;
-        }, 100);
-    }
-    cameraShakeTime = game.time.now + 100;
+
+    game.add.tween(game.camera).to({y: game.camera.y - 20}, 40, null, true, 0, 4, true);
 
 }
 
