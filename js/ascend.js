@@ -25,6 +25,7 @@ var alertSound,
     livesText,
     livesTimer = 0,
     metroidSound,
+    platformBumpSound,
     platformReleaseTime = 0,
     platformSet,
     platforms,
@@ -94,7 +95,7 @@ function create() {
     // Add Sounds
     bulletSound = game.add.audio('bulletSound');
     bgSound = game.add.audio('bg');
-    platformCrashSound = game.add.audio('platformHit');
+    platformBumpSound = game.add.audio('platformBump');
     platformShotSound = game.add.audio('platformShot');
     enemyBoom = game.add.audio('expl');
     alertSound = game.add.audio('alert');
@@ -239,6 +240,7 @@ function bumpPlatform(ship, platform) {
         cameraShake();
         ship.body.velocity.y = 180;
         bumpTimer = game.time.now + 2000;
+        platformBumpSound.play();
     }
 }
 

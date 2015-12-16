@@ -16,7 +16,7 @@ function ascendLoad() {
     game.load.spritesheet('asteroidExplosion', 'asteroidExplosion.png', 64, 64);
     game.load.audio('bg', 'bg.mp3');
     game.load.audio('bulletSound', 'bulletSound.mp3');
-    game.load.audio('platformHit', 'platformHit.mp3');
+    game.load.audio('platformBump', 'platformBump.mp3');
     game.load.audio('platformShot', 'platformShot.mp3');
     game.load.audio('expl', 'expl.mp3');
     game.load.audio('alert', 'intruderAlert.mp3');
