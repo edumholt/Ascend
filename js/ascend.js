@@ -224,22 +224,9 @@ function fireBullet() {
 
 function bumpPlatform(ship, platform) {
     if(game.time.now > bumpTimer) {
-        var shiftTween = game.add.tween(platform);
-        var rockTween = game.add.tween(platform);
-        var disappearTween = game.add.tween(platform);
-
-        shiftTween.to({angle: -10}, 10, null, true);
-        rockTween.to({angle: 10}, 60, null, false, 0, 6, true);
-        disappearTween.to({alpha: .1}, 50);
-        shiftTween.chain(rockTween);
-        rockTween.chain(disappearTween);
-        disappearTween.onComplete.add(function() {
-            platform.kill();
-        }, this);
-
+        platformShake(platform);
         cameraShake();
         ship.body.velocity.y = 180;
-        bumpTimer = game.time.now + 2000;
         platformBumpSound.play();
     }
 }
@@ -253,6 +240,25 @@ function asteroidExplode(bullet, asteroid) {
     asteroidExplosion.animations.play('explode');
     asteroidSound.play();
     incrementScore(10);
+}
+
+function platformShake(platform) {
+
+    var shiftTween = game.add.tween(platform);
+        var rockTween = game.add.tween(platform);
+        var disappearTween = game.add.tween(platform);
+
+        shiftTween.to({angle: -10}, 10, null, true);
+        rockTween.to({angle: 10}, 60, null, false, 0, 6, true);
+        disappearTween.to({alpha: .1}, 50);
+        shiftTween.chain(rockTween);
+        rockTween.chain(disappearTween);
+        disappearTween.onComplete.add(function() {
+            platform.kill();
+        }, this);
+
+        bumpTimer = game.time.now + 2000;
+
 }
 
 function cameraShake() {
