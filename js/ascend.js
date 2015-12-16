@@ -2,22 +2,20 @@ var game = new Phaser.Game(800, 620, Phaser.AUTO, '', {preload: preload, create:
 
 var alertSound,
     alertTimer = 0,
-    aliensGroupOne,
-    aliensGroupTwo,
-    aliensGroupThree,
     asteroidCrashSound,
     asteroids,
     asteroidReleaseRate = .004,
     asteroidExplosion,
     bgSound,
+    beacons,
     bellSound,
     bulletSound,
     bullets,
     bulletTime = 0,
     bumpTimer = 0,
-    beacons,
     cameraShakeTime = 0,
     cameraView,
+    counter = 0,
     cursors,
     dangerZone,
     expl,
@@ -27,8 +25,8 @@ var alertSound,
     livesText,
     livesTimer = 0,
     metroidSound,
-    // platform,
     platformReleaseTime = 0,
+    platformSet,
     platforms,
     safeFlag = true,
     score = 0,
@@ -36,7 +34,6 @@ var alertSound,
     splashScreen,
     startGameTime = 0,
     warningText,
-    shipStats,
     starfield,
     ship;
 
@@ -67,6 +64,7 @@ function preload() {
 function create() {
 
     game.physics.startSystem(Phaser.Physics.ARCADE);
+    // game.plugins.add(Phaser.Plugin.Inspector);
 
     starfield = game.add.tileSprite(0, 20, 800, 620, 'starfield');
 
@@ -116,6 +114,7 @@ function update() {
     game.physics.arcade.collide(ship, asteroids, checkLives, null, this);
 	game.physics.arcade.overlap(ship, beacons, addLives, null, this);
     game.physics.arcade.collide(ship, platforms, bumpPlatform, null, this);
+    game.physics.arcade.collide(bullets, platforms, killBulletWithThud, null, this);
 
     starfield.tilePosition.y += 0.34;
 
@@ -182,64 +181,9 @@ function gameStartDelay () {
     }
 }
 
-function createRandomPlatformWithAliens() {
-
-    if(game.time.now > platformReleaseTime) {
-        var platform = platforms.getFirstExists(false);
-        if(platform) {
-            platform.reset(Math.random() * 550 + 120, 0);
-            platform.anchor.setTo(0.5, 0.5);
-            platform.body.velocity.setTo(0, 30);
-            platform.body.immovable = true;
-            platform.alpha = 1.0;
-            platform.angle = 0;
-            createAliensOnPlatform(platform);
-            platformReleaseTime = game.time.now + 10000;
-        }
-    }
-
-}
-
-function createAliensOnPlatform(platform) {
-
-    var leftAlien, rightAlien;
-
-    var whichAlien = Math.floor(Math.random() * 3 + 1);
-
-    // Create left alien
-    switch(whichAlien) {
-        case 1:
-            leftAlien = aliensGroupOne.getFirstExists(false);
-            break;
-        case 2:
-            leftAlien = aliensGroupTwo.getFirstExists(false);
-            break;
-        case 3:
-            leftAlien = aliensGroupThree.getFirstExists(false);
-            break;
-    }
-
-    leftAlien.reset(platform.x - 100, platform.y - 40);
-    leftAlien.body.velocity.setTo(0, 30);
-
-    whichAlien = Math.floor(Math.random() * 3 + 1);
-
-    // Create right alien
-    switch(whichAlien) {
-        case 1:
-            rightAlien = aliensGroupOne.getFirstExists(false);
-            break;
-        case 2:
-            rightAlien = aliensGroupTwo.getFirstExists(false);
-            break;
-        case 3:
-            rightAlien = aliensGroupThree.getFirstExists(false);
-            break;
-    }
-
-    rightAlien.reset(platform.x + 100, platform.y - 40);
-    rightAlien.body.velocity.setTo(0, 30);
-
+function killBulletWithThud(bullet, platform) {
+    bullet.kill();
+    platformShotSound.play();
 }
 
 function createRandomAsteroid() {
