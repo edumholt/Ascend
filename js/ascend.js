@@ -1,4 +1,4 @@
-var game = new Phaser.Game(800, 620, Phaser.AUTO, '', {preload: preload, create: create, update: update});
+var game = new Phaser.Game(800, 620, Phaser.AUTO, '', {preload: preload, create: create, update: update, render: render});
 
 var alertSound,
     alertTimer = 0,
@@ -169,6 +169,12 @@ function update() {
 
 }
 
+function render() {
+
+
+
+}
+
 function createText() {
     scoreText = game.add.text(16, 36, "SCORE: 0", {font: '400 24px Audiowide', fill: '#9F9'});
     livesText = game.add.text(620, 36, "LIVES: 3", {font: '400 24px Audiowide', fill: '#9F9'});
@@ -228,6 +234,8 @@ function bumpPlatform(ship, platform) {
         cameraShake();
         ship.body.velocity.y = 180;
         platformBumpSound.play();
+
+        bumpTimer = game.time.now + 2000;
     }
 }
 
@@ -245,19 +253,17 @@ function asteroidExplode(bullet, asteroid) {
 function platformShake(platform) {
 
     var shiftTween = game.add.tween(platform);
-        var rockTween = game.add.tween(platform);
-        var disappearTween = game.add.tween(platform);
+    var rockTween = game.add.tween(platform);
+    var disappearTween = game.add.tween(platform);
 
-        shiftTween.to({angle: -10}, 10, null, true);
-        rockTween.to({angle: 10}, 60, null, false, 0, 6, true);
-        disappearTween.to({alpha: .1}, 50);
-        shiftTween.chain(rockTween);
-        rockTween.chain(disappearTween);
-        disappearTween.onComplete.add(function() {
-            platform.kill();
-        }, this);
-
-        bumpTimer = game.time.now + 2000;
+    shiftTween.to({angle: -10}, 10, null, true);
+    rockTween.to({angle: 10}, 60, null, false, 0, 6, true);
+    disappearTween.to({alpha: .1}, 50);
+    shiftTween.chain(rockTween);
+    rockTween.chain(disappearTween);
+    disappearTween.onComplete.add(function() {
+        platform.kill();
+    }, this);
 
 }
 

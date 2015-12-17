@@ -1,5 +1,3 @@
-
-
 function createRandomPlatformWithAliens() {
 
     if(game.time.now > platformReleaseTime) {
@@ -22,34 +20,36 @@ function createAliensOnPlatform(platform) {
     // Create left alien
     switch(whichAlien) {
         case 1:
-            leftAlien = game.add.sprite(platform.x - 120, platform.y - 60, 'alien1');
+            leftAlien = game.add.sprite(platform.x - 90, platform.y - 40, 'alien1');
             break;
         case 2:
-            leftAlien = game.add.sprite(platform.x - 120, platform.y - 60, 'alien2');
+            leftAlien = game.add.sprite(platform.x - 90, platform.y - 40, 'alien2');
             break;
         case 3:
-            leftAlien = game.add.sprite(platform.x - 120, platform.y - 60, 'alien3');
+            leftAlien = game.add.sprite(platform.x - 90, platform.y - 40, 'alien3');
             break;
     }
 
     game.physics.enable(leftAlien);
+    leftAlien.anchor.setTo(0.5, 0.5);
     leftAlien.body.velocity.setTo(0, 30);
-
+    console.log("Left alien touching = " + leftAlien.body.touching.down);
     whichAlien = Math.floor(Math.random() * 3 + 1);
 
     // Create right alien
     switch(whichAlien) {
         case 1:
-            rightAlien = game.add.sprite(platform.x + 60, platform.y - 60, 'alien1');
+            rightAlien = game.add.sprite(platform.x + 90, platform.y - 40, 'alien1');
             break;
         case 2:
-            rightAlien = game.add.sprite(platform.x + 60, platform.y - 60, 'alien2');
+            rightAlien = game.add.sprite(platform.x + 90, platform.y - 40, 'alien2');
             break;
         case 3:
-            rightAlien = game.add.sprite(platform.x + 60, platform.y - 60, 'alien3');
+            rightAlien = game.add.sprite(platform.x + 90, platform.y - 40, 'alien3');
             break;
     }
 
     game.physics.enable(rightAlien);
+    rightAlien.anchor.setTo(0.5, 0.5);
     rightAlien.body.velocity.setTo(0, 30);
 }
