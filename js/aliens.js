@@ -14,6 +14,8 @@ function createRandomPlatformWithAliens() {
 function createAliensOnPlatform(platform) {
 
     var leftAlien, rightAlien;
+    var leftAlienTween, rightAlienTween;
+    // TODO Create these tweens, then create collisions to trigger them
 
     var whichAlien = Math.floor(Math.random() * 3 + 1);
 
@@ -26,14 +28,14 @@ function createAliensOnPlatform(platform) {
             leftAlien = game.add.sprite(platform.x - 90, platform.y - 40, 'alien2');
             break;
         case 3:
-            leftAlien = game.add.sprite(platform.x - 90, platform.y - 40, 'alien3');
+            leftAlien = game.add.sprite(platform.x - 90, platform.y - 50, 'alien3');
             break;
     }
 
-    game.physics.enable(leftAlien);
     leftAlien.anchor.setTo(0.5, 0.5);
+    aliens.add(leftAlien);
     leftAlien.body.velocity.setTo(0, 30);
-    console.log("Left alien touching = " + leftAlien.body.touching.down);
+
     whichAlien = Math.floor(Math.random() * 3 + 1);
 
     // Create right alien
@@ -45,11 +47,11 @@ function createAliensOnPlatform(platform) {
             rightAlien = game.add.sprite(platform.x + 90, platform.y - 40, 'alien2');
             break;
         case 3:
-            rightAlien = game.add.sprite(platform.x + 90, platform.y - 40, 'alien3');
+            rightAlien = game.add.sprite(platform.x + 90, platform.y - 50, 'alien3');
             break;
     }
 
-    game.physics.enable(rightAlien);
     rightAlien.anchor.setTo(0.5, 0.5);
+    aliens.add(rightAlien);
     rightAlien.body.velocity.setTo(0, 30);
 }

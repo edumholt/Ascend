@@ -16,7 +16,7 @@ function createGameSprites() {
     platforms = game.add.physicsGroup();
 
     // Create a group to hold all aliens
-    aliensGroup = game.add.physicsGroup();
+    aliens = game.add.physicsGroup();
 
     dangerZone = game.add.sprite(0, game.height - 30, 'DoNotEnter');
 

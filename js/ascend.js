@@ -2,6 +2,7 @@ var game = new Phaser.Game(800, 620, Phaser.AUTO, '', {preload: preload, create:
 
 var alertSound,
     alertTimer = 0,
+    aliens,
     asteroidCrashSound,
     asteroids,
     asteroidReleaseRate = .004,
@@ -116,6 +117,7 @@ function update() {
 	game.physics.arcade.overlap(ship, beacons, addLives, null, this);
     game.physics.arcade.collide(ship, platforms, bumpPlatform, null, this);
     game.physics.arcade.collide(bullets, platforms, killBulletWithThud, null, this);
+    game.physics.arcade.collide(platforms, aliens, releaseAliens, null, this);
 
     starfield.tilePosition.y += 0.34;
 
@@ -233,10 +235,15 @@ function bumpPlatform(ship, platform) {
         platformShake(platform);
         cameraShake();
         ship.body.velocity.y = 180;
+        platform.body.velocity.y = -10;
         platformBumpSound.play();
 
         bumpTimer = game.time.now + 2000;
     }
+}
+
+function releaseAliens(platform, alien) {
+    console.log("Released the Aliens!");
 }
 
 function asteroidExplode(bullet, asteroid) {
