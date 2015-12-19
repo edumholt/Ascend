@@ -14,8 +14,6 @@ function createRandomPlatformWithAliens() {
 function createAliensOnPlatform(platform) {
 
     var leftAlien, rightAlien;
-    var leftAlienTween, rightAlienTween;
-    // TODO Create these tweens, then create collisions to trigger them
 
     var whichAlien = Math.floor(Math.random() * 3 + 1);
 

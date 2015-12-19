@@ -2,11 +2,14 @@ var game = new Phaser.Game(800, 620, Phaser.AUTO, '', {preload: preload, create:
 
 var alertSound,
     alertTimer = 0,
+    alienExplosion,
+    alienExplosionSound,
     aliens,
     asteroidCrashSound,
     asteroids,
     asteroidReleaseRate = .004,
     asteroidExplosion,
+    asteroidTime = 0,
     bgSound,
     beacons,
     bellSound,
@@ -70,6 +73,7 @@ function create() {
 
     starfield = game.add.tileSprite(0, 20, 800, 620, 'starfield');
 
+    // Create and setup ship
     ship = game.add.sprite(400, 300, 'ship');
     game.physics.arcade.enable(ship);
     ship.body.gravity.y = 140;
@@ -98,6 +102,7 @@ function create() {
     bgSound = game.add.audio('bg');
     platformBumpSound = game.add.audio('platformBump');
     platformShotSound = game.add.audio('platformShot');
+    alienExplosionSound = game.add.audio('alienExplosion');
     enemyBoom = game.add.audio('expl');
     alertSound = game.add.audio('alert');
     asteroidCrashSound = game.add.audio('asteroidCrash');
@@ -118,6 +123,7 @@ function update() {
     game.physics.arcade.collide(ship, platforms, bumpPlatform, null, this);
     game.physics.arcade.collide(bullets, platforms, killBulletWithThud, null, this);
     game.physics.arcade.collide(platforms, aliens, releaseAliens, null, this);
+    game.physics.arcade.collide(aliens, bullets, killAlien, null, this);
 
     starfield.tilePosition.y += 0.34;
 
@@ -198,10 +204,14 @@ function killBulletWithThud(bullet, platform) {
 function createRandomAsteroid() {
 
     if(Math.random() < asteroidReleaseRate) {
-        var asteroid = asteroids.create(Math.random() * 600 + 100, 0, 'asteroid', 1);
-        asteroid.body.velocity.setTo(Math.random() * 60 - 30, Math.random() * 30 + 20);
-        asteroid.animations.add('spin', [], 10, true);
-        asteroid.play('spin');
+        // Limit the asteroid generation to once every two seconds
+        if(game.time.now > asteroidTime) {
+            var asteroid = asteroids.create(Math.random() * 600 + 100, 0, 'asteroid', 1);
+            asteroid.body.velocity.setTo(Math.random() * 60 - 30, Math.random() * 30 + 20);
+            asteroid.animations.add('spin', [], 10, true);
+            asteroid.play('spin');
+            asteroidTime = game.time.now + 2000;
+        }
     }
 
 }
@@ -243,7 +253,20 @@ function bumpPlatform(ship, platform) {
 }
 
 function releaseAliens(platform, alien) {
-    console.log("Released the Aliens!");
+    var alienTween = game.add.tween(alien).to({x: game.rnd.integerInRange(0, 800), y:game.rnd.integerInRange(0, 500)}, 1800, "Sine.easeInOut", true, 0, 10, true);
+    alien.body.gravity.y = 10;
+}
+
+function killAlien(alien, bullet) {
+    alien.kill();
+    bullet.kill();
+    alienExplosion = game.add.sprite(alien.x, alien.y, 'alienExplosion');
+    alienExplosion.anchor.setTo(0.5, 0.5);
+    alienExplosion.animations.add('alienExplode', [], 40);
+    alienExplosion.animations.play('alienExplode');
+    alienExplosionSound.play();
+    incrementScore(40);
+
 }
 
 function asteroidExplode(bullet, asteroid) {
