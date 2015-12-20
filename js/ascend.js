@@ -25,6 +25,7 @@ var alertSound,
     expl,
     explodeShip,
     fireButton,
+    hitText,
     lives = 3,
     livesText,
     livesTimer = 0,
@@ -91,6 +92,7 @@ function create() {
     cursors = game.input.keyboard.createCursorKeys();
     fireButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 
+    hitText = game.add.text(280, 40, '', {font: '400 28px Audiowide', fill: '#F33', align: 'center'});
     warningText = game.add.text(16, 76, '', {font: '400 20px Audiowide', fill: '#F33', align: 'center'});
 
     splashScreen = game.add.sprite(0, 0, 'splashScreen');
@@ -130,6 +132,7 @@ function update() {
     game.physics.arcade.collide(bullets, platforms, killBulletWithThud, null, this);
     game.physics.arcade.collide(platforms, aliens, releaseAliens, null, this);
     game.physics.arcade.collide(aliens, bullets, killAlien, null, this);
+
 
     starfield.tilePosition.y += 0.20;
     starfieldTop.tilePosition.y += 0.30;
@@ -186,7 +189,7 @@ function update() {
 
 function render() {
 
-    game.debug.spriteBounds(aliens);
+    // game.debug.spriteBounds(aliens);
 
 }
 
@@ -260,8 +263,8 @@ function bumpPlatform(ship, platform) {
 }
 
 function releaseAliens(platform, alien) {
-    var alienTween = game.add.tween(alien).to({x: game.rnd.integerInRange(0, 800), y:game.rnd.integerInRange(100, 500)}, 1800, "Sine.easeInOut", true, 0, 1, true);
-    alien.body.gravity.y = 10;
+    var alienTween = game.add.tween(alien).to({x: game.rnd.integerInRange(0, 800), y:game.rnd.integerInRange(100, 500)}, 1800, "Sine.easeInOut", true, 0, 3, true);
+    alien.body.gravity.y = 5;
 }
 
 function killAlien(alien, bullet) {
@@ -325,6 +328,10 @@ function addLives(ship, beacon) {
 function checkLives(){
     // to avoid multiple short collisions
     if(game.time.now > livesTimer) {
+        hitText.text = 'SHIP DAMAGE!';
+        setTimeout(function() {
+            hitText.text = '';
+        }, 500);
         lives--;
         if(lives > 0) {
             asteroidCrashSound.play();
