@@ -2,6 +2,7 @@ function ascendLoad() {
     game.load.path = 'assets/';
 
     game.load.image('starfield');
+    game.load.image('starfieldTop');
     game.load.image('DoNotEnter');
     game.load.image('bullet');
     game.load.image('platform');

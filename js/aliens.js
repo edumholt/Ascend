@@ -1,11 +1,11 @@
 function createRandomPlatformWithAliens() {
 
     if(game.time.now > platformReleaseTime) {
-        var platform = platforms.create(Math.random() * 550 + 120, 0, 'platform');
+        var platform = platforms.create(Math.random() * 550 + 120, 40, 'platform');
         platform.anchor.setTo(0.5, 0.5);
         platform.body.velocity.setTo(0, 30);
         platform.body.immovable = true;
-        platformReleaseTime = game.time.now + 10000;
+        platformReleaseTime = game.time.now + 8000;
         createAliensOnPlatform(platform);
     }
 
@@ -33,6 +33,7 @@ function createAliensOnPlatform(platform) {
     leftAlien.anchor.setTo(0.5, 0.5);
     aliens.add(leftAlien);
     leftAlien.body.velocity.setTo(0, 30);
+    leftAlien.body.bounce.y = 1;
 
     whichAlien = Math.floor(Math.random() * 3 + 1);
 
@@ -52,4 +53,5 @@ function createAliensOnPlatform(platform) {
     rightAlien.anchor.setTo(0.5, 0.5);
     aliens.add(rightAlien);
     rightAlien.body.velocity.setTo(0, 30);
+    rightAlien.body.bounce.y = 1;
 }

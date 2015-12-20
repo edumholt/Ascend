@@ -1,4 +1,4 @@
-var game = new Phaser.Game(800, 620, Phaser.AUTO, '', {preload: preload, create: create, update: update, render: render});
+var game = new Phaser.Game(800, 750, Phaser.AUTO, '', {preload: preload, create: create, update: update, render: render});
 
 var alertSound,
     alertTimer = 0,
@@ -40,6 +40,7 @@ var alertSound,
     startGameTime = 0,
     warningText,
     starfield,
+    starfieldTop,
     ship;
 
 // Required to load Google web font
@@ -72,6 +73,7 @@ function create() {
     // game.plugins.add(Phaser.Plugin.Inspector);
 
     starfield = game.add.tileSprite(0, 20, 800, 620, 'starfield');
+    starfieldTop = game.add.tileSprite(0, 20, 800, 620, 'starfieldTop');
 
     // Create and setup ship
     ship = game.add.sprite(400, 300, 'ship');
@@ -116,16 +118,21 @@ function create() {
 
 function update() {
     
+    aliens.setAll('checkWorldBounds', 'true');
+    aliens.setAll('outOfBoundsKill', 'true');
+
     // Collisions
 	game.physics.arcade.collide(bullets, asteroids, asteroidExplode, null, this);
     game.physics.arcade.collide(ship, asteroids, checkLives, null, this);
+    game.physics.arcade.collide(ship, aliens, checkLives, null, this);
 	game.physics.arcade.overlap(ship, beacons, addLives, null, this);
     game.physics.arcade.collide(ship, platforms, bumpPlatform, null, this);
     game.physics.arcade.collide(bullets, platforms, killBulletWithThud, null, this);
     game.physics.arcade.collide(platforms, aliens, releaseAliens, null, this);
     game.physics.arcade.collide(aliens, bullets, killAlien, null, this);
 
-    starfield.tilePosition.y += 0.34;
+    starfield.tilePosition.y += 0.20;
+    starfieldTop.tilePosition.y += 0.30;
 
     createRandomPlatformWithAliens();
     createRandomAsteroid();
@@ -157,7 +164,7 @@ function update() {
         }
     }
 
-    if(ship.y >= game.world.height - 160) {
+    if(ship.y >= game.world.height - 260) {
         warningText.text = "WARNING: ACCELERATE SHIP";
         if(game.time.now > alertTimer) {
             alertSound.play();
@@ -168,7 +175,7 @@ function update() {
         warningText.text = '';
     }
 
-    if(ship.y >= game.world.height - 50 && safeFlag) {
+    if(ship.y >= game.world.height - 150 && safeFlag) {
         gameOver();
         safeFlag = false;
     }
@@ -179,7 +186,7 @@ function update() {
 
 function render() {
 
-
+    game.debug.spriteBounds(aliens);
 
 }
 
@@ -253,7 +260,7 @@ function bumpPlatform(ship, platform) {
 }
 
 function releaseAliens(platform, alien) {
-    var alienTween = game.add.tween(alien).to({x: game.rnd.integerInRange(0, 800), y:game.rnd.integerInRange(0, 500)}, 1800, "Sine.easeInOut", true, 0, 10, true);
+    var alienTween = game.add.tween(alien).to({x: game.rnd.integerInRange(0, 800), y:game.rnd.integerInRange(100, 500)}, 1800, "Sine.easeInOut", true, 0, 1, true);
     alien.body.gravity.y = 10;
 }
 
@@ -323,6 +330,7 @@ function checkLives(){
             asteroidCrashSound.play();
             livesText.text = "LIVES: " + lives;
             livesTimer = game.time.now + 500;
+            cameraShake();
         } else {
             gameOver();
         }
